@@ -1,1 +1,1 @@
-Hosted on Vercel: https://filmkatalogus.vercel.app/
+Hosztoltam Vercelre, a következő linken elérhető: https://filmkatalogus.vercel.app/

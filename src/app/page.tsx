@@ -1,34 +1,34 @@
-// import React, { lazy, Suspense } from 'react';
+// Kötelező importok
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { getfilmbycim } from './database/dbmuveletek';
+import { RowDataPacket } from 'mysql2';
 
-// const MovieCard = lazy(() => import('./MovieCard'));
+export default async function Otthon() {
+  // Dinamikusan betöltöm a komponenst lazy loadinggal
+  const FilmKomponens = dynamic(() => import('./filmkomponens'), { ssr: false });
+  
+  // Filmek címeinek lekérése az adatbázisból
+  const result = await getfilmbycim();
 
-// interface MovieListProps {
-//   movies: Movie[];
-// }
-
-// const MovieList: React.FC<MovieListProps> = ({ movies }) => {
-//   return (
-//     <div>
-//       {movies.map((movie) => (
-//         <Suspense key={movie.id} fallback={<div>Loading...</div>}>
-//           <MovieCard movie={movie} />
-//         </Suspense>
-//       ))}
-//     </div>
-//   );
-// };
-
-// export default MovieList;
-
-import Link from 'next/link';
-
-export default function Otthon() {
+  // Ha vannak címek, kicsomagolom őket és kilistázom a FilmKomponensben
+  if (result !== null) {
+    const extracted = result[0] as RowDataPacket[];
     return (
       <div>
-        <Link href="/filmreszletek">
-            Film Katalógus
-        </Link>
+        <ul>
+          {extracted.map((movie, index) => (
+            <FilmKomponens key={index} title={movie.cim} />
+          ))}
+        </ul>
+      </div>
+    );
+  } else {
+    // Ha nincsenek filmek, megfelelő üzenet megjelenítése
+    return (
+      <div>
+        <h1>Nincsenek filmek!</h1>
       </div>
     );
   }
-
+}
