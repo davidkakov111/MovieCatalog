@@ -8,9 +8,27 @@ const pool = mysql.createPool({
   password: 'bhSQkesCHI',
   database: 'sql11679887',
   port: 3306,
+  charset: 'utf8mb4',
 });
 
-// Egy film rekord lekérdezése ID alapján a "filmek" táblából
+// Film adatok lekérdezése cim alapján a "filmek" táblából
+export async function getFilmDetailsBycim(cim: string) {
+  const connection = await pool.getConnection();
+  try {
+    const rows = await connection.query('SELECT * FROM filmek WHERE cim = ?', [cim]);
+    if ([rows].length === 0) {
+      return null;
+    }
+    return rows;
+  } catch (error) {
+    console.error('Hiba a lekerdezes kozben:', error);
+    return null;
+  } finally {
+    await connection.release();
+  }
+}
+
+// Film rekord lekérdezése ID alapján a "filmek" táblából
 export async function getFilmById(id: number) {
   const connection = await pool.getConnection();
   try {
@@ -44,20 +62,21 @@ export async function getfilmbycim() {
   }
 }
 
-// Film rekord létrehozása a "filmek" táblában
-export async function createFilmRecord(movieData: any): Promise<void> {
-    const connection = await pool.getConnection();
-    try {
-        // SQL insert parancs létrehozása és végrehajtása az értékekkel
-        const sql = 'INSERT INTO filmek (cim, leiras, megjelenes_datuma, poszter_url, ertekeles) VALUES (?, ?, ?, ?, ?)';
-        const values = [movieData.cim, movieData.leiras, movieData.megjelenesDatuma, movieData.poszter_url, movieData.ertekeles];
-        await connection.execute(sql, values);
-        console.log('Rekord sikeresen letrehozva!');
-    } catch (error) {
-        console.error('Hiba a rekord letrehozasa kozben:', error, "Hiba vege!");
-    } finally {
-        await connection.release();
-    }
+// Film létrehozása
+export async function createFilmRecord(movieData: any): Promise<string> {
+  const connection = await pool.getConnection();
+  try {
+      // SQL insert parancs létrehozása és végrehajtása az értékekkel
+      const sql = 'INSERT INTO filmek (cim, leiras, megjelenes_datuma, poszter_url, ertekeles) VALUES (?, ?, ?, ?, ?)';
+      const values = [movieData.cim, movieData.leiras, movieData.megjelenes_datuma, movieData.poszter_url, movieData.ertekeles];
+      await connection.execute(sql, values);
+      return 'Rekord sikeresen letrehozva!';
+  } catch (error) {
+      console.error('Hiba a rekord letrehozasa kozben:', error, "Hiba vege!");
+      throw new Error('Hiba a rekord letrehozasa kozben');
+  } finally {
+      await connection.release();
+  }
 }
 
 // Adatbázis tábla létrehozása a filmekhez

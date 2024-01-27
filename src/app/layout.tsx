@@ -23,7 +23,7 @@ export default function RootLayout({
     // HTML fejléc nyelve
     <html lang="en">
       {/* Oldal törzsének kezdete, Inter font osztály alkalmazása */}
-      <body className={inter.className}>
+      <body className={`${inter.className} min-h-screen bg-gray-720`}>
         {/* Oldal fejléce, Header komponens */}
         <Header />
         {/* Gyerek komponensek (tartalom) */}
