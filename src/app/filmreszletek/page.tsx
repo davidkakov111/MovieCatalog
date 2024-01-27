@@ -1,6 +1,5 @@
 "use client"
-import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 const fetchFilmDetails = async (cim:any) => {
   try {
@@ -14,18 +13,17 @@ const fetchFilmDetails = async (cim:any) => {
 };
 
 const FilmReszletek: React.FC = () => {
-  const params = useSearchParams();
   const [filmDetails, setFilmDetails] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!params) {
-        return;
-      }
+    // Olvassuk ki a címsort a böngésző címéből
+    const urlParams = new URLSearchParams(window.location.search);
+    const cim = urlParams.get('title');
 
-      const cim = params.get('title');
-      if (cim === null) {
+    const fetchData = async () => {
+      if (!cim) {
+        setIsLoading(false);
         return;
       }
 
@@ -39,14 +37,14 @@ const FilmReszletek: React.FC = () => {
       }
     };
 
-    fetchData(); 
-  }, [params]);
+    fetchData();
+  }, []); // A dependency tömb üres, így a useEffect csak egyszer fut le, a komponens mount-jakor
 
-  if (!params || isLoading) {
-    return <h1>{isLoading ? 'Betöltés...' : 'Ismeretlen film!'}</h1>;
+  if (isLoading) {
+    return <h1>Betöltés...</h1>;
   }
 
-  if (filmDetails === null) {
+  if (!filmDetails) {
     return <h1>Nincsenek adatok a filmről!</h1>;
   }
 
@@ -54,15 +52,12 @@ const FilmReszletek: React.FC = () => {
   const formattedDate = new Date(film_adatok.megjelenes_datuma).toLocaleDateString();
 
   return (
-    <Suspense fallback={<h1>Betöltés...</h1>}>
-      <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-100 rounded-md">
-        <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
-        <img className="w-full h-auto" src={film_adatok.poszter_url} alt={film_adatok.cim} />
-        <p className="text-gray-700 mb-4">Megjelenés dátuma: {formattedDate}</p>
-        <p className="text-gray-700 mb-4">Értékelés: {film_adatok.ertekeles}</p>
-        <p className="text-gray-700 mb-4">{film_adatok.leiras}</p>
-      </div>
-    </Suspense>
+    <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-100 rounded-md">
+      <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
+      <p className="text-gray-700 mb-4">Megjelenés dátuma: {formattedDate}</p>
+      <p className="text-gray-700 mb-4">Értékelés: {film_adatok.ertekeles}</p>
+      <p className="text-gray-700 mb-4">{film_adatok.leiras}</p>
+    </div>
   );
 };
 
