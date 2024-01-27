@@ -29,9 +29,14 @@ const FilmReszletek: React.FC = () => {
         return;
       }
 
-      const data = await fetchFilmDetails(cim);
-      setFilmDetails(data);
-      setIsLoading(false);
+      try {
+        const data = await fetchFilmDetails(cim);
+        setFilmDetails(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Hiba történt a film részleteinek lekérése közben:', error);
+        setIsLoading(false);
+      }
     };
 
     // Csak a kliensoldali renderelés során futtasd a useEffect-et
@@ -44,21 +49,22 @@ const FilmReszletek: React.FC = () => {
     return <h1>{isLoading ? 'Betöltés...' : 'Ismeretlen film!'}</h1>;
   }
 
-  if (filmDetails !== null) {
-    const film_adatok = filmDetails[0][0];
-    const formattedDate = new Date(film_adatok.megjelenes_datuma).toLocaleDateString();
-    return (
-      <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-100 rounded-md">
-        <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
-        {/* <img className="w-full h-auto" src={film_adatok.poszter_url} alt={film_adatok.cim} /> */}
-        <p className="text-gray-700 mb-4">Megjelenés dátuma: {formattedDate}</p>
-        <p className="text-gray-700 mb-4">Értékelés: {film_adatok.ertekeles}</p>
-        <p className="text-gray-700 mb-4">{film_adatok.leiras}</p>
-      </div>
-    );
-  } else {
+  if (filmDetails === null) {
     return <h1>Nincsenek adatok a filmről!</h1>;
   }
+
+  const film_adatok = filmDetails[0][0];
+  const formattedDate = new Date(film_adatok.megjelenes_datuma).toLocaleDateString();
+
+  return (
+    <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-100 rounded-md">
+      <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
+      <img className="w-full h-auto" src={film_adatok.poszter_url} alt={film_adatok.cim} />
+      <p className="text-gray-700 mb-4">Megjelenés dátuma: {formattedDate}</p>
+      <p className="text-gray-700 mb-4">Értékelés: {film_adatok.ertekeles}</p>
+      <p className="text-gray-700 mb-4">{film_adatok.leiras}</p>
+    </div>
+  );
 };
 
 export default FilmReszletek;
