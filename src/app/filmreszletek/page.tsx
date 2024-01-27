@@ -39,10 +39,7 @@ const FilmReszletek: React.FC = () => {
       }
     };
 
-    // Csak a kliensoldali renderelés során futtasd a useEffect-et
-    if (typeof window !== 'undefined') {
-      fetchData();
-    }
+    fetchData(); // Nem szükséges az "if (typeof window !== 'undefined')" ellenőrzés, mert az useEffect csak a kliensoldali rendereléskor fut le
   }, [params]);
 
   if (!params || isLoading) {
