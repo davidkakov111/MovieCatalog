@@ -19,30 +19,48 @@ const FilmReszletek: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // useEffect: A komponens életciklusának része, aszinkron műveletek végrehajtására használom
+  // useEffect(() => {
+  //   // A film részletek lekérdezése a szerverről
+  //   const fetchFilmDetails = async () => {
+  //     try {
+  //       // Ellenőrizem, hogy van-e cím, mielőtt lekérdezném a részleteket
+  //       if (cim) {
+  //         // Fetch kérés a szerverhez a film részletekért
+  //         const response = await fetch(`/api/filmDetailsBycim?title=${encodeURIComponent(cim)}`);
+  //         // JSON válasz feldolgozása
+  //         const data = await response.json();
+  //         // Állapot frissítése a lekért film részletekkel
+  //         setFilmDetails(data as any);
+  //       }
+  //     } catch (error) {
+  //       // Hibakezelés: logolom a hibát, ha valami nem sikerült
+  //       console.error('Hiba történt a film részleteinek lekérése közben:', error);
+  //       return <h1>Nincsenek adatok a filmről!</h1>;
+  //     } finally {
+  //       // Betöltési állapot beállítása 'false'-ra, akkor is, ha hiba történt
+  //       setIsLoading(false);
+  //     }
+  //   };
+  //   // Fetch hívás indítása a komponens első renderelésekor, vagy ha a cím megváltozik
+  //   fetchFilmDetails();
+  // }, [cim]);
+
   useEffect(() => {
-    // A film részletek lekérdezése a szerverről
     const fetchFilmDetails = async () => {
       try {
-        // Ellenőrizem, hogy van-e cím, mielőtt lekérdezném a részleteket
         if (cim) {
-          // Fetch kérés a szerverhez a film részletekért
           const response = await fetch(`/api/filmDetailsBycim?title=${encodeURIComponent(cim)}`);
-          // JSON válasz feldolgozása
           const data = await response.json();
-          // Állapot frissítése a lekért film részletekkel
           setFilmDetails(data as any);
         }
       } catch (error) {
-        // Hibakezelés: logolom a hibát, ha valami nem sikerült
         console.error('Hiba történt a film részleteinek lekérése közben:', error);
-        return <h1>Nincsenek adatok a filmről!</h1>;
+        // Visszatérési érték nélkül
       } finally {
-        // Betöltési állapot beállítása 'false'-ra, akkor is, ha hiba történt
         setIsLoading(false);
       }
     };
-
-    // Fetch hívás indítása a komponens első renderelésekor, vagy ha a cím megváltozik
+  
     fetchFilmDetails();
   }, [cim]);
 
