@@ -3,10 +3,11 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { getfilmbycim } from './database/dbmuveletek';
 import { RowDataPacket } from 'mysql2';
+import Search from './components/search';
 
 export default async function Otthon() {
   // Dinamikusan betöltöm a komponenst lazy loadinggal
-  const FilmKomponens = dynamic(() => import('./filmkomponens'), { ssr: false });
+  const FilmKomponens = dynamic(() => import('./components/filmkomponens'), { ssr: false });
   
   // Filmek címeinek lekérése az adatbázisból
   const result = await getfilmbycim();
@@ -16,11 +17,14 @@ export default async function Otthon() {
     const extracted = result[0] as RowDataPacket[];
     return (
       <div>
-        <ul>
-          {extracted.map((movie, index) => (
-            <FilmKomponens key={index} title={movie.cim} />
-          ))}
-        </ul>
+        <div className="mt-4 flex items-center justify-center gap-2 md:mt-8">
+          <Search placeholder="Search..." extracted={extracted} />
+          {/* <CreateInvoice /> */}
+        </div>
+        <br />
+        {extracted.map((movie, index) => (
+          <FilmKomponens key={index} title={movie.cim} />
+        ))}
       </div>
     );
   } else {
