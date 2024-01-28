@@ -28,6 +28,25 @@ export async function getFilmDetailsBycim(cim: string) {
   }
 }
 
+// Felhasználó adatainak lekérdezése email alapján a "users" táblából
+export async function getUserDetailsByEmail(email: string): Promise<any> {
+  const connection = await pool.getConnection();
+  try {
+    const result = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
+    const extracted_result:any = result[0]
+    if (extracted_result.length === 0) {
+      return 'SignUp';
+    }
+    return extracted_result;
+  } catch (error) {
+    console.error('Hiba a lekérdezés közben:', error);
+    // Szerverhiba esetén egy szöveget adunk vissza
+    return 'Szerverhiba';
+  } finally {
+    await connection.release();
+  }
+}
+
 // Film rekord lekérdezése ID alapján a "filmek" táblából
 export async function getFilmById(id: number) {
   const connection = await pool.getConnection();
@@ -79,22 +98,61 @@ export async function createFilmRecord(movieData: any): Promise<string> {
   }
 }
 
+// User regisztrálása
+export async function createUserRecord(UserData: any): Promise<string> {
+  const connection = await pool.getConnection();
+  try {
+    // SQL insert parancs létrehozása és végrehajtása az értékekkel
+    const sql = 'INSERT INTO users (email, password, type) VALUES (?, ?, ?)';
+    const values = [UserData.email, UserData.password, 'Viewer'];
+    await connection.execute(sql, values);
+    return 'Success';
+  } catch (error:any) {
+    // Ellenőrizze, hogy az e-mail cím már létezik-e
+    if (error.code === 'ER_DUP_ENTRY') {
+      return 'SignIn';
+    } else {
+      throw new Error('Hiba a rekord letrehozasa kozben');
+    }
+  } finally {
+    await connection.release();
+  }
+}
+
 // Adatbázis tábla létrehozása a filmekhez
 export async function createFilmsTable() {
-    const connection = await pool.getConnection();
-    try {
-      await connection.query(`
-        CREATE TABLE IF NOT EXISTS filmek (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          cim VARCHAR(255) NOT NULL,
-          leiras TEXT NOT NULL,
-          megjelenes_datuma DATE NOT NULL,
-          poszter_url VARCHAR(255) NOT NULL,
-          ertekeles INT NOT NULL
-        )
-      `);
-    } finally {
-      connection.release();
-    }
+  const connection = await pool.getConnection();
+  try {
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS filmek (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        cim VARCHAR(255) NOT NULL,
+        leiras TEXT NOT NULL,
+        megjelenes_datuma DATE NOT NULL,
+        poszter_url VARCHAR(255) NOT NULL,
+        ertekeles INT NOT NULL
+      )
+    `);
+    return 'success';
+  } finally {
+    connection.release();
   }
-  
+}
+
+// Adatbázis tábla létrehozása a felhasználóknak
+export async function createUsersTable() {
+  const connection = await pool.getConnection();
+  try {
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        type ENUM('Viewer', 'Editor', 'Admin') NOT NULL
+      )
+    `);
+    return 'success';
+  } finally {
+    connection.release();
+  }
+}
