@@ -1,6 +1,6 @@
 // Az importált csomagok
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createFilmRecord } from '../../src/app/database/dbmuveletek';
+import { createFilmRecord } from '../../src/app/database/dbmethods';
 
 // Api handler 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

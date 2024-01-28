@@ -1,6 +1,6 @@
 // Az importált csomagok
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getFilmDetailsBycim } from '../../src/app/database/dbmuveletek';
+import { getFilmDetailsBycim } from '../../src/app/database/dbmethods';
 
 // Az API végpont kezelőfüggvénye
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
