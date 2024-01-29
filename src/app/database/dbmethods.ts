@@ -8,7 +8,7 @@ const pool = mysql.createPool({
   password: 'bhSQkesCHI',
   database: 'sql11679887',
   port: 3306,
-  charset: 'utf8mb4',
+  charset: 'utf8',
 });
 
 // Felhasználó típusának frissítése az "users" táblában email alapján
@@ -123,13 +123,17 @@ export async function createFilmRecord(movieData: any): Promise<string> {
   const connection = await pool.getConnection();
   try {
       // SQL insert parancs létrehozása és végrehajtása az értékekkel
-      const sql = 'INSERT INTO filmek (cim, leiras, megjelenes_datuma, poszter_url, ertekeles) VALUES (?, ?, ?, ?, ?)';
-      const values = [movieData.cim, movieData.leiras, movieData.megjelenes_datuma, movieData.poszter_url, movieData.ertekeles];
+      const sql = 'INSERT INTO filmek (cim, leiras, megjelenes_datuma, poszter_url, kategoria) VALUES (?, ?, ?, ?, ?)';
+      const values = [movieData.cim, movieData.leiras, movieData.megjelenes_datuma, movieData.poszter_url, movieData.kategoria];
       await connection.execute(sql, values);
       return 'Rekord sikeresen letrehozva!';
-  } catch (error) {
+  } catch (error:any) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return 'Meglevo film';
+    } else {
       console.error('Hiba a rekord letrehozasa kozben:', error, "Hiba vege!");
       throw new Error('Hiba a rekord letrehozasa kozben');
+    }
   } finally {
       await connection.release();
   }
@@ -163,12 +167,16 @@ export async function createFilmsTable() {
     await connection.query(`
       CREATE TABLE IF NOT EXISTS filmek (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        cim VARCHAR(255) NOT NULL,
+        cim VARCHAR(255) NOT NULL UNIQUE,
         leiras TEXT NOT NULL,
         megjelenes_datuma DATE NOT NULL,
         poszter_url VARCHAR(255) NOT NULL,
-        ertekeles INT NOT NULL
-      )
+        ertekeles FLOAT DEFAULT 0,
+        rated_user_ids TEXT,
+        kategoria ENUM('Akció', 'Vígjáték', 'Dráma', 'Horror', 'Sci-fi') NOT NULL,
+        reviews INT DEFAULT 0,
+        kepek TEXT
+      );
     `);
     return 'success';
   } finally {

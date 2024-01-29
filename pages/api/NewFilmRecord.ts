@@ -19,7 +19,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     // Ellenőrizem az eredményt és vissza küldöm a megfelelő választ
     if (result) {
-        return res.status(200).json({ result: result });
+        if (result === 'Rekord sikeresen letrehozva!') {
+            return res.status(200).json({ result: result });
+        } else {
+            return res.status(500).json({ result: result });
+        }
     } else {
         return res.status(500).json({ result: "Internal server error!" });
     }

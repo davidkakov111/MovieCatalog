@@ -5,16 +5,17 @@ const FilmForm: React.FC = () => {
   // Állapotok inicializálása
   const [cim, setCim] = useState<string>('');
   const [leiras, setLeiras] = useState<string>('');
-  const [megjelenesDatuma, setMegjelenesDatuma] = useState<string>('');
   const [poszterUrl, setPoszterUrl] = useState<string>('');
-  const [ertekeles, setErtekeles] = useState<number>(0);
+  const [selectedKategoria, setSelectedKategoria] = useState<string>('');
+
+  const kategoriak = ['Akció', 'Vígjáték', 'Dráma', 'Horror', 'Sci-fi'];
 
   // Űrlap beküldés kezelése
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Ellenőrzések
-    if (!cim || !leiras || !megjelenesDatuma || !poszterUrl.toString() || ertekeles < 0 || ertekeles > 10) {
+    if (!cim || !leiras || !poszterUrl.toString() || !selectedKategoria) {
       alert('Minden mező kitöltése kötelező, és az értékelés csak 0 és 10 közötti szám lehet!');
       return;
     }
@@ -24,6 +25,12 @@ const FilmForm: React.FC = () => {
       return;
     }
 
+    // A jelenlegi dátum létrehozása
+    const currentDate = new Date();
+
+    // Dátum formázása YYYY-MM-DD formátumra
+    const megjelenesDatuma = currentDate.toISOString().split('T')[0];
+
     try {
       // Sikeres ellenőrzés esetén összeállítom a film adatokat
       const result = {
@@ -31,7 +38,7 @@ const FilmForm: React.FC = () => {
         "leiras": leiras,
         "megjelenes_datuma": megjelenesDatuma,
         "poszter_url": poszterUrl,
-        "ertekeles": ertekeles,
+        "kategoria": selectedKategoria,
       };
 
       // El küldöm a POST kérést a backend-nek
@@ -42,15 +49,18 @@ const FilmForm: React.FC = () => {
         },
         body: JSON.stringify(result),
       });
-
+      const responseData = await response.json();
       if (response.ok) {
         // Sikeres válasz esetén megjelenítem a felhasználónak az üzenetet
-        const responseData = await response.json();
-        alert(`${responseData.result}`);
+        alert(`A film sikeresen elmentve!`);
       } else {
-        // Hiba esetén konzolra logolom a hibát és értesítem a felhasználót
-        console.error('Hiba az adatküldés során:', response.statusText);
-        alert('Hiba az adatküldés során');
+        if (responseData.result === "Meglevo film") {
+          alert('Ez a film már el volt mentve, ments el masikat!');
+        } else {
+          // Hiba esetén konzolra logolom a hibát és értesítem a felhasználót
+          console.error('Hiba az adatküldés során:', response.statusText);
+          alert('Hiba az adatküldés során');
+        }
       }
     } catch (error) {
       // Hiba esetén konzolra logolom a hibát és értesítem a felhasználót
@@ -68,21 +78,21 @@ const FilmForm: React.FC = () => {
         <input type="text" value={cim} onChange={(e) => setCim(e.target.value)} className="w-full mt-1 p-2 bg-white border rounded" />
       </label>
 
-      {/* Leírás textarea */}
+      {/* Kategória választó mező */}
       <label className="block mb-2 text-black">
-        Leírás:
-        <textarea value={leiras} onChange={(e) => setLeiras(e.target.value)} className="w-full mt-1 p-2 bg-white border rounded"></textarea>
-      </label>
-
-      {/* Megjelenés dátuma input */}
-      <label className="block mb-2 text-black">
-        Megjelenés dátuma:
-        <input
-          type="date"
-          value={megjelenesDatuma}
-          onChange={(e) => setMegjelenesDatuma(e.target.value)}
+        Kategória:
+        <select
+          value={selectedKategoria}
+          onChange={(e) => setSelectedKategoria(e.target.value)}
           className="w-full mt-1 p-2 bg-white border rounded"
-        />
+        >
+          <option value="" disabled>Válassz egy kategóriát</option>
+          {kategoriak.map((kategoria, index) => (
+            <option key={index} value={kategoria}>
+              {kategoria}
+            </option>
+          ))}
+        </select>
       </label>
 
       {/* Poszter URL input */}
@@ -96,15 +106,10 @@ const FilmForm: React.FC = () => {
         />
       </label>
 
-      {/* Értékelés input */}
+      {/* Leírás textarea */}
       <label className="block mb-2 text-black">
-        Értékelés:
-        <input
-          type="number"
-          value={ertekeles}
-          onChange={(e) => setErtekeles(Math.min(10, Math.max(0, Number(e.target.value))))}
-          className="w-full mt-1 p-2 bg-white border rounded"
-        />
+        Leírás:
+        <textarea value={leiras} onChange={(e) => setLeiras(e.target.value)} className="w-full mt-1 p-2 bg-white border rounded"></textarea>
       </label>
 
       {/* Beküldés gomb */}
