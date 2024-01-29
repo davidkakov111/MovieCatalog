@@ -11,7 +11,7 @@ const Otthon: React.FC = () => {
 
   // Dinamikusan betöltött komponens a lazy loading megoldásához
   const FilmKomponens = dynamic(() => import('./components/filmkomponents'), { ssr: false });
-
+ 
   // useEffect hook használata a komponens mount-ja során a filmadatok lekérésére
   useEffect(() => {
     const fetchData = async () => {
