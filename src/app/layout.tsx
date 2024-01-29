@@ -5,6 +5,7 @@ import "./globals.css";
 import { getServerSession } from "next-auth";
 import SignOut from "./Auth/SignOut/SignOut"
 import Link from 'next/link';
+import { setEngine } from "crypto";
 
 // Inter font beállítása
 const inter = Inter({ subsets: ["latin"] });
@@ -22,6 +23,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession()
+  const user = session?.user
   return (
     <html lang="en">
       {/* Oldal törzsének kezdete, Inter font osztály alkalmazása */}
@@ -40,9 +42,17 @@ export default async function RootLayout({
             <nav>
               <ul className="flex space-x-4">
                 {/* Film létrehozása link */}
-                {session ? (
+                {user?.image === "Editor" ? (
                   <li>
                     <Link href="/editorpanel">+Film</Link>
+                  </li>
+                ) : (
+                  <div></div>
+                )}
+                {/* Admin panel */}
+                {user?.image === "Admin" ? (
+                  <li>
+                    <Link href="/Admin">Admin</Link>
                   </li>
                 ) : (
                   <div></div>

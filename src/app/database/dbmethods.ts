@@ -11,6 +11,32 @@ const pool = mysql.createPool({
   charset: 'utf8mb4',
 });
 
+// Felhasználó típusának frissítése az "users" táblában email alapján
+export async function updateUserTypeByEmail(email: string, newType: string): Promise<string> {
+  const connection = await pool.getConnection();
+  try {
+    // Ellenőrizzük, hogy a felhasználó létezik-e az adatbázisban
+    const userExistsResult = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
+
+    const userExists = [userExistsResult].length > 0;
+
+    if (!userExists) {
+      return 'Felhasználó nem található';
+    }
+
+    // Frissítjük a felhasználó típusát
+    await connection.query('UPDATE users SET type = ? WHERE email = ?', [newType, email]);
+
+    return 'Sikeres frissítés';
+  } catch (error) {
+    console.error('Hiba a frissítés közben:', error);
+    // Szerverhiba esetén egy szöveget adunk vissza
+    return 'Szerverhiba';
+  } finally {
+    await connection.release();
+  }
+}
+
 // Film adatok lekérdezése cim alapján a "filmek" táblából
 export async function getFilmDetailsBycim(cim: string) {
   const connection = await pool.getConnection();
@@ -76,6 +102,17 @@ export async function getfilmbycim() {
   } catch (error) {
     console.error('Hiba a lekerdezes kozben:', error);
     return null;
+  } finally {
+    connection.release();
+  }
+}
+
+// Összes felhasználó lekérése
+export async function getAllUsers() {
+  const connection = await pool.getConnection();
+  try {
+    const results = await connection.query('SELECT * FROM users');
+    return results[0];
   } finally {
     connection.release();
   }

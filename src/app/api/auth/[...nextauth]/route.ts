@@ -12,7 +12,7 @@ const handler = NextAuth({
             email: {  },
             password: {  }
             },
-        async authorize(credentials:any, req) {
+        async authorize(credentials:any, req:any) {
             const result = await getUserDetailsByEmail(credentials.email)
             if (result === 'Szerverhiba' || result === 'SignUp') {
                 return null;
@@ -23,13 +23,16 @@ const handler = NextAuth({
             if (passwordCorrect) {
                 return {
                     id: user.id,
+                    name: user.id, 
                     email: user.email,
-                    type: user.type
+                    image: user.type,
                 }
             }
             return null;
         }
-    })]
+        
+    })],
+    
 })
 
 export {handler as GET, handler as POST};
