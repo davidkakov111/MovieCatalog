@@ -5,7 +5,6 @@ import "./globals.css";
 import { getServerSession } from "next-auth";
 import SignOut from "./Auth/SignOut/SignOut"
 import Link from 'next/link';
-import { setEngine } from "crypto";
 
 // Inter font beállítása
 const inter = Inter({ subsets: ["latin"] });

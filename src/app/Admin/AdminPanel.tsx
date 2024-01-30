@@ -2,10 +2,14 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 
+// AdminPanel komponens, amely kezeli a felhasználók típusának frissítését
 const AdminPanel = () => {
+  // State hook-ok inicializálása
   const [users, setUsers] = useState<Array<{ id: number; email: string; type: string }>>([]);
 
+  // Komponens mount-jakor lefutó useEffect hook
   useEffect(() => {
+    // Aszinkron adatlekérés a backend API-n keresztül
     const fetchData = async () => {
       try {
         const response = await fetch('/api/getAllUsers', {
@@ -17,6 +21,7 @@ const AdminPanel = () => {
 
         const jsres = await response.json();
 
+        // Ha a válasz rendben van, frissíti a felhasználók állapotát
         if (response.ok) {
           setUsers(jsres.result);
         } else {
@@ -27,16 +32,20 @@ const AdminPanel = () => {
       }
     };
 
+    // Adatok lekérése az API-ról
     fetchData();
-  }, []);;
+  }, []); // A dependency tömb üres, így a useEffect csak egyszer fut le, a komponens mount-jakor
 
-  const TypeUpdate = async (email:any, newType:any) => {
+  // Felhasználó típusának frissítése
+  const TypeUpdate = async (email: any, newType: any) => {
     try {
+      // A frissítéshez szükséges adatok összeállítása
       const result = {
         "email": email,
         "newType": newType,
-      }
+      };
 
+      // Aszinkron kérés a backend API-hoz a felhasználó típusának frissítésére
       const response = await fetch('/api/updateUserType', {
         method: 'POST',
         headers: {
@@ -45,15 +54,17 @@ const AdminPanel = () => {
         body: JSON.stringify(result),
       });
 
+      // A válasz a backend-től JSON formátumban
       const responseData = await response.json();
-      
+
+      // Ha a válasz rendben van, frissíti a felhasználók állapotát és megjeleníti az új típust
       if (response.ok) {
         // Az állapot frissítése a friss adatokkal
         setUsers((prevUsers) =>
           prevUsers.map((user) => (user.email === email ? { ...user, type: newType } : user))
         );
 
-        // Az új típust alert()-ben jelenítjük meg
+        // Az új típust alert()-ben jelenítem meg
         alert(responseData.result);
       } else {
         console.error('Hiba történt a felhasználók lekérése közben:', responseData.result);
@@ -63,6 +74,7 @@ const AdminPanel = () => {
     }
   };
 
+  // JSX kód, amely megjeleníti az AdminPanel komponenst
   return (
     <div className="container mx-auto mt-8">
       <div className="text-center">
@@ -76,10 +88,12 @@ const AdminPanel = () => {
           </tr>
         </thead>
         <tbody>
+          {/* Felhasználók megjelenítése */}
           {users.map(user => (
             <tr key={user.id}>
               <td className="py-2 px-4 border-b">{user.email}</td>
               <td className="py-2 px-4 border-b">
+                {/* Típus frissítése a select mezőn keresztül */}
                 <select
                   value={user.type}
                   onChange={e => TypeUpdate(user.email, e.target.value)}
@@ -98,4 +112,5 @@ const AdminPanel = () => {
   );
 };
 
+// AdminPanel exportálása
 export default AdminPanel;

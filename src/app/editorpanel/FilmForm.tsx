@@ -40,7 +40,7 @@ const FilmForm: React.FC = () => {
         "poszter_url": poszterUrl,
         "kategoria": selectedKategoria,
       };
-
+      
       // El küldöm a POST kérést a backend-nek
       const response = await fetch('/api/NewFilmRecord', {
         method: 'POST',

@@ -15,7 +15,7 @@ const pool = mysql.createPool({
 export async function updateUserTypeByEmail(email: string, newType: string): Promise<string> {
   const connection = await pool.getConnection();
   try {
-    // Ellenőrizzük, hogy a felhasználó létezik-e az adatbázisban
+    // Ellenőrizem, hogy a felhasználó létezik-e az adatbázisban
     const userExistsResult = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
 
     const userExists = [userExistsResult].length > 0;
@@ -24,13 +24,30 @@ export async function updateUserTypeByEmail(email: string, newType: string): Pro
       return 'Felhasználó nem található';
     }
 
-    // Frissítjük a felhasználó típusát
+    // Frissítem a felhasználó típusát
     await connection.query('UPDATE users SET type = ? WHERE email = ?', [newType, email]);
 
     return 'Sikeres frissítés';
   } catch (error) {
     console.error('Hiba a frissítés közben:', error);
-    // Szerverhiba esetén egy szöveget adunk vissza
+    // Szerverhiba esetén egy szöveget adok vissza
+    return 'Szerverhiba';
+  } finally {
+    await connection.release();
+  }
+}
+
+// Felhasználó típusának frissítése az "users" táblában email alapján
+export async function updateFilmByID(Updated_film: any): Promise<string> {
+  const connection = await pool.getConnection();
+  try {
+    // Frissíem a filmet
+    await connection.query('UPDATE filmek SET cim = ?, leiras = ?, poszter_url = ?, kategoria = ?, kepek = ? WHERE id = ?', 
+      [Updated_film.cim, Updated_film.leiras, Updated_film.poszter_url, Updated_film.kategoria, Updated_film.kepek, Updated_film.id]);
+    return 'Sikeres frissítés';
+  } catch (error) {
+    console.error('Hiba a frissítés közben:', error);
+    // Szerverhiba esetén egy szöveget adok vissza
     return 'Szerverhiba';
   } finally {
     await connection.release();
@@ -66,7 +83,7 @@ export async function getUserDetailsByEmail(email: string): Promise<any> {
     return extracted_result;
   } catch (error) {
     console.error('Hiba a lekérdezés közben:', error);
-    // Szerverhiba esetén egy szöveget adunk vissza
+    // Szerverhiba esetén egy szöveget adok vissza
     return 'Szerverhiba';
   } finally {
     await connection.release();
@@ -149,7 +166,7 @@ export async function createUserRecord(UserData: any): Promise<string> {
     await connection.execute(sql, values);
     return 'Success';
   } catch (error:any) {
-    // Ellenőrizze, hogy az e-mail cím már létezik-e
+    // Ellenőrizem, hogy az e-mail cím már létezik-e
     if (error.code === 'ER_DUP_ENTRY') {
       return 'SignIn';
     } else {

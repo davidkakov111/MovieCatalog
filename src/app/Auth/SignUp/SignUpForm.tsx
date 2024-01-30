@@ -29,7 +29,7 @@ const SignUpForm = () => {
       return;
     }
 
-    // Az ellenőrzéseket sikeresen átmentve, elküldjük a regisztrációs kérést
+    // Az ellenőrzéseket sikeresen átmentve, elküldöm a regisztrációs kérést
     const databaseResponse = await fetch('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify({

@@ -45,12 +45,16 @@ const Otthon: React.FC = () => {
     fetchData();
   }, []);
 
-  // Ha még nincsenek betöltve az adatok, megjelenítünk egy betöltési üzenetet
+  // Ha még nincsenek betöltve az adatok, megjelenítek egy betöltési üzenetet
   if (!filmData) {
-    return <div>Betöltés...</div>;
+    return (
+    <div className="flex items-center justify-center h-screen">
+      <h1 className="text-center">Betöltés...</h1>
+    </div>
+    )
   }
 
-  // Ha vannak adatok, megjelenítjük a keresőt és a filmkomponenseket
+  // Ha vannak adatok, megjelenítem a keresőt és a filmkomponenseket
   return (
     <div>
       <div className="mt-4 flex items-center justify-center gap-2 md:mt-8">
