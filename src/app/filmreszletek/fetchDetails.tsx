@@ -33,6 +33,53 @@ const FilmReszletek: React.FC = () => {
       try {
         const data = await fetchFilmDetails(cim);
         setFilmDetails(data);
+        const film = data[0][0];
+        const reviews = film.reviews + 1
+        // A jelenlegi idő pecsét
+        const timestamp: number = Math.floor(Date.now() / 1000);
+        if (film.review_dates === null) {
+          // Még nem kapott ez a film megtekintést, ezért adok neki
+          const dateArray = [timestamp];
+          const review_dates = `[${dateArray.map(item => String(item)).join(', ')}]`;
+          const Update_film_review = {
+            "reviews": reviews,
+            "review_dates": review_dates,
+            "id": film.id,
+          }
+          // El küldöm a POST kérést a backend-nek
+          const response = await fetch('/api/updateFilmReview', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Update_film_review),
+          });
+          if (!response.ok) {
+            alert("Nem sikerült elmenteni ennek a filmnek az új review-jét!")
+          }
+        } else {
+          // Ez a film már kapott megtekintést
+          // A string array-t visszaállítom 
+          const reviewdates = eval(film.review_dates) as number[];
+          reviewdates.push(timestamp);
+          const review_dates = `[${reviewdates.map(item => String(item)).join(', ')}]`;
+          const Update_film_review = {
+            "reviews": reviews,
+            "review_dates": review_dates,
+            "id": film.id,
+          }
+          // El küldöm a POST kérést a backend-nek
+          const response = await fetch('/api/updateFilmReview', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Update_film_review),
+          });
+          if (!response.ok) {
+            alert("Nem sikerült elmenteni ennek a filmnek az új review-jét!")
+          }
+        }
         setIsLoading(false);
       } catch (error) {
         console.error('Hiba történt a film részleteinek lekérése közben:', error);

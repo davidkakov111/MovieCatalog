@@ -60,13 +60,59 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
       try {
         const data = await fetchFilmDetails(cim);
         setFilmDetails(data);
+        const film = data[0][0];
+        const reviews = film.reviews + 1
+        // A jelenlegi idő pecsét
+        const timestamp: number = Math.floor(Date.now() / 1000);
+        if (film.review_dates === null) {
+          // Még nem kapott ez a film megtekintést
+          const dateArray = [timestamp];
+          const review_dates = `[${dateArray.map(item => String(item)).join(', ')}]`;
+          const Update_film_review = {
+            "reviews": reviews,
+            "review_dates": review_dates,
+            "id": film.id,
+          }
+          // El küldöm a POST kérést a backend-nek
+          const response = await fetch('/api/updateFilmReview', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Update_film_review),
+          });
+          if (!response.ok) {
+            alert("Nem sikerült elmenteni ennek a filmnek az új review-jét!")
+          }
+        } else {
+          // Ez a film már kapott megtekintést
+          // A string array-t visszaállítom 
+          const reviewdates = eval(film.review_dates) as number[];
+          reviewdates.push(timestamp);
+          const review_dates = `[${reviewdates.map(item => String(item)).join(', ')}]`;
+          const Update_film_review = {
+            "reviews": reviews,
+            "review_dates": review_dates,
+            "id": film.id,
+          }
+          // El küldöm a POST kérést a backend-nek
+          const response = await fetch('/api/updateFilmReview', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Update_film_review),
+          });
+          if (!response.ok) {
+            alert("Nem sikerült elmenteni ennek a filmnek az új review-jét!")
+          }
+        }
         setIsLoading(false);
       } catch (error) {
         console.error('Hiba történt a film részleteinek lekérése közben:', error);
         setIsLoading(false);
       }
     };
-
     fetchData();
   }, []); // A dependency tömb üres, így a useEffect csak egyszer fut le, a komponens mount-jakor
 
@@ -100,59 +146,69 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
     if (ertekelesInput === '') {
         alert("Az értékelés nem lehet üres!")
     } else {
-        if (film_adatok.rated_user_ids === null) {
-            // Még nem kapott ez a film értékelést
-            const Array = [UserID];
-            const rated_user_ids = `[${Array.map(item => String(item)).join(', ')}]`;
-            const update_rateing = {
-              film_id: film_adatok.id,
-              film_ertekeles: ertekelesInput,
-              film_rated_user_ids: rated_user_ids,
-            }
-            const response = await UpdateRateing(update_rateing)
-            if (response !== null &&  response.ok) {
-              // Sikeres válasz esetén a főoldalra irányítom a felhasználót
-              router.push("/")
-            } else {
-              if (response !== null) {
-                  alert("Server error!")
-              } else {
-                  alert('Hiba történt a film értékelésének frissítése közben!')
-              }
-            }
-        } else {
-            // Ennek a filmnek már vannak értékelései, ezért az
-            // átlag értékelésébe beleszámítom az új értékelést
-            const UjErtekeles: any = ertekelesInput
-            // A string array-t visszaállítom 
-            const rated_user_ids = eval(film_adatok.rated_user_ids) as number[];
-            // Ennyi alkalommal kapott értékelést a film
-            const NrOfRatings = rated_user_ids.length;
-            // A film új átlag értékelése
-            const film_ertekeles = ((film_adatok.ertekeles * NrOfRatings) + UjErtekeles) / (NrOfRatings + 1)
-            // Az értékelő felhasználó id-ját is belteszem a többi közé, hogy kétszer ne tudjon egy filmet értékelni
-            rated_user_ids.push(UserID);
-            // Viszaállítom az arrayt stringé hogy elmenthessem az adatbázisba
-            const RatedUserIds = `[${rated_user_ids.map(item => String(item)).join(', ')}]`;
-            // Összeállított adat az API számára
-            const update_rateing = {
-                film_id: film_adatok.id,
-                film_ertekeles: film_ertekeles,
-                film_rated_user_ids: RatedUserIds,
-            }
-            const response = await UpdateRateing(update_rateing)
-            if (response !== null &&  response.ok) {
-              // Sikeres válasz esetén a főoldalra irányítom a felhasználót
-              router.push("/")
-            } else {
-                if (response !== null) {
-                    alert("Server error!")
-                } else {
-                    alert('Hiba történt a film értékelésének frissítése közben!')
-                }
-            }
-            
+      // A jelenlegi idő pecsét
+      const timestamp: number = Math.floor(Date.now() / 1000);
+      if (film_adatok.rated_user_ids === null) {
+        // Még nem kapott ez a film értékelést
+        // Az új user id array, amiben az értékelésiket leadott felhasználók szerepelnek
+        const Array = [UserID];
+        const rated_user_ids = `[${Array.map(item => String(item)).join(', ')}]`;
+        // Az új rate dates array, amiben az értékelés leadásának időpontjai szerepelnek
+        const dateArray = [timestamp];
+        const rate_dates = `[${dateArray.map(item => String(item)).join(', ')}]`;
+        const update_rateing = {
+          film_id: film_adatok.id,
+          film_ertekeles: ertekelesInput,
+          film_rated_user_ids: rated_user_ids,
+          rate_dates: rate_dates,
         }
+        const response = await UpdateRateing(update_rateing)
+        if (response !== null &&  response.ok) {
+          // Sikeres válasz esetén a főoldalra irányítom a felhasználót
+          router.push("/")
+        } else {
+          if (response !== null) {
+              alert("Server error!")
+          } else {
+              alert('Hiba történt a film értékelésének frissítése közben!')
+          }
+        }
+      } else {
+        // Ennek a filmnek már vannak értékelései
+        const UjErtekeles: any = ertekelesInput
+        // A string array-t visszaállítom 
+        const rated_user_ids = eval(film_adatok.rated_user_ids) as number[];
+        // Ennyi alkalommal kapott értékelést a film
+        const NrOfRatings = rated_user_ids.length;
+        // A film új átlag értékelése
+        const film_ertekeles = ((film_adatok.ertekeles * NrOfRatings) + UjErtekeles) / (NrOfRatings + 1)
+        // Az értékelő felhasználó id-ját is belteszem a többi közé, hogy kétszer ne tudjon egy filmet értékelni
+        rated_user_ids.push(UserID);
+        // Viszaállítom az arrayt stringé hogy elmenthessem az adatbázisba
+        const RatedUserIds = `[${rated_user_ids.map(item => String(item)).join(', ')}]`;
+        // A string array-t visszaállítom, ami az értékelések datumát menti
+        const ratedates = eval(film_adatok.rate_dates) as number[];
+        ratedates.push(timestamp);
+        const rate_dates = `[${ratedates.map(item => String(item)).join(', ')}]`;
+        // Összeállított adat az API számára
+        const update_rateing = {
+            film_id: film_adatok.id,
+            film_ertekeles: film_ertekeles,
+            film_rated_user_ids: RatedUserIds,
+            rate_dates: rate_dates,
+        }
+        const response = await UpdateRateing(update_rateing)
+        if (response !== null &&  response.ok) {
+          // Sikeres válasz esetén a főoldalra irányítom a felhasználót
+          router.push("/")
+        } else {
+            if (response !== null) {
+                alert("Server error!")
+            } else {
+                alert('Hiba történt a film értékelésének frissítése közben!')
+            }
+        }
+      }
     }
   };
   if (film_adatok.rated_user_ids === null) {

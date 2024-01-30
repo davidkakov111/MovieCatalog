@@ -54,13 +54,30 @@ export async function updateFilmByID(Updated_film: any): Promise<string> {
   }
 }
 
+// Film review frissítése id alapján
+export async function updateFilmReviewByID(Update_film_review: any): Promise<string> {
+  const connection = await pool.getConnection();
+  try {
+    // Frissíem a film review-jét
+    await connection.query('UPDATE filmek SET reviews = ?, review_dates = ? WHERE id = ?', 
+      [Update_film_review.reviews, Update_film_review.review_dates, Update_film_review.id]);
+    return 'Sikeres frissítés';
+  } catch (error) {
+    console.error('Hiba a frissítés közben:', error);
+    // Szerverhiba esetén egy szöveget adok vissza
+    return 'Szerverhiba';
+  } finally {
+    await connection.release();
+  }
+}
+
 // Film értékelésének frissítése
 export async function updateFilmRateing(NewFilmRateing: any): Promise<string> {
   const connection = await pool.getConnection();
   try {
     // Frissíem az értékelést
-    await connection.query('UPDATE filmek SET ertekeles = ?, rated_user_ids = ? WHERE id = ?', 
-      [NewFilmRateing.film_ertekeles, NewFilmRateing.film_rated_user_ids, NewFilmRateing.film_id]);
+    await connection.query('UPDATE filmek SET ertekeles = ?, rated_user_ids = ?, rate_dates = ? WHERE id = ?', 
+      [NewFilmRateing.film_ertekeles, NewFilmRateing.film_rated_user_ids, NewFilmRateing.rate_dates, NewFilmRateing.film_id]);
     return 'Sikeres frissítés';
   } catch (error) {
     console.error('Hiba a frissítés közben:', error);
@@ -209,7 +226,9 @@ export async function createFilmsTable() {
         rated_user_ids TEXT,
         kategoria ENUM('Akció', 'Vígjáték', 'Dráma', 'Horror', 'Sci-fi') NOT NULL,
         reviews INT DEFAULT 0,
-        kepek TEXT
+        kepek TEXT,
+        rate_dates TEXT,
+        review_dates TEXT
       );
     `);
     return 'success';
