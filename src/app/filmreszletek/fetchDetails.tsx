@@ -66,7 +66,7 @@ const FilmReszletek: React.FC = () => {
       <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
       <img className="w-full h-auto" src={film_adatok.poszter_url} alt={film_adatok.cim} />
       <p className="text-gray-700 mb-4">Megjelenés dátuma: {formattedDate}</p>
-      <p className="text-gray-700 mb-4">Értékelés: {film_adatok.ertekeles}</p>
+      <p className="text-gray-700 mb-4">A film átlag értékelése: {Math.round(film_adatok.ertekeles)}/100</p>
       <p className="text-gray-700 mb-4">{film_adatok.leiras}</p>
     </div>
   );

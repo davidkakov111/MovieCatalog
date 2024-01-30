@@ -37,13 +37,30 @@ export async function updateUserTypeByEmail(email: string, newType: string): Pro
   }
 }
 
-// Felhasználó típusának frissítése az "users" táblában email alapján
+// Film frissítése id alapján
 export async function updateFilmByID(Updated_film: any): Promise<string> {
   const connection = await pool.getConnection();
   try {
     // Frissíem a filmet
     await connection.query('UPDATE filmek SET cim = ?, leiras = ?, poszter_url = ?, kategoria = ?, kepek = ? WHERE id = ?', 
       [Updated_film.cim, Updated_film.leiras, Updated_film.poszter_url, Updated_film.kategoria, Updated_film.kepek, Updated_film.id]);
+    return 'Sikeres frissítés';
+  } catch (error) {
+    console.error('Hiba a frissítés közben:', error);
+    // Szerverhiba esetén egy szöveget adok vissza
+    return 'Szerverhiba';
+  } finally {
+    await connection.release();
+  }
+}
+
+// Film értékelésének frissítése
+export async function updateFilmRateing(NewFilmRateing: any): Promise<string> {
+  const connection = await pool.getConnection();
+  try {
+    // Frissíem az értékelést
+    await connection.query('UPDATE filmek SET ertekeles = ?, rated_user_ids = ? WHERE id = ?', 
+      [NewFilmRateing.film_ertekeles, NewFilmRateing.film_rated_user_ids, NewFilmRateing.film_id]);
     return 'Sikeres frissítés';
   } catch (error) {
     console.error('Hiba a frissítés közben:', error);
