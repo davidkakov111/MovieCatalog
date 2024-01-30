@@ -155,7 +155,38 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
         }
     }
   };
-
+  if (film_adatok.rated_user_ids === null) {
+    // Film részletek megjelenítése értékelés opcióval
+    return (
+      <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-300 rounded-md">
+      <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
+      <img className="w-full h-auto" src={film_adatok.poszter_url} alt={film_adatok.cim} />
+      <p className="text-gray-700 mt-4 mb-4">Megjelenés dátuma: {formattedDate}</p>
+      <p className="text-gray-700">
+        A film átlag értékelése: {Math.round(film_adatok.ertekeles)}/100
+      </p>
+      {/* Input mező hozzáadása */}
+      <input
+          type="number"
+          min="1"
+          max="100"
+          placeholder="Értékelés"
+          value={ertekelesInput}
+          onChange={handleChange}
+          className="mr-2 px-4 py-2 border border-gray-300 rounded"
+      />
+      {/* Gomb hozzáadása */}
+      <button
+          className="bg-yellow-500 text-white px-4 py-2 rounded"
+          onClick={handleClick}
+      >
+          Beküld
+      </button>
+      
+      <p className="text-gray-700 mt-5">{film_adatok.leiras}</p>
+      </div>
+    );
+  }
   const arrayFromStr = eval(film_adatok.rated_user_ids) as number[];
   if (arrayFromStr.includes(UserID)) {
     // Film részletek megjelenítése értékelés opció nélkül
