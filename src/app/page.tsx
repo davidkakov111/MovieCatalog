@@ -85,7 +85,7 @@ const Otthon: React.FC = () => {
           setHotTopicFilmData(top5Film)
         } else {
           // Hiba esetén konzolra logolás
-          console.error('Hiba az adatküldés során:', response.statusText);
+          console.error('Hiba a filmek lekérése során:', response.statusText);
         }
       } catch (error) {
         // Hiba esetén konzolra logolás

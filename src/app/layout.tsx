@@ -35,11 +35,14 @@ export default async function RootLayout({
           <div className="container mx-auto flex justify-between items-center">
             {/* A fejléc bal felső részén lévő szöveg, amely egy Link komponens, visszavezet a főoldalra */}
             <div className="text-xl font-bold">
-              <Link href="/">Film Katalógus</Link>
+              <Link href="/">Filmek</Link>
             </div>
             {/* A navigációs menü, amely tartalmazza a SignUp és SignIn linkeket */}
             <nav>
               <ul className="flex space-x-4">
+                <li>
+                  <Link href="/Analytics">Analytics</Link>
+                </li>
                 {/* Film létrehozása link */}
                 {user?.image === "Editor" ? (
                   <li>
