@@ -94,7 +94,7 @@ const AnalyticsPanelForm: React.FC = () => {
         // Hozzáadom a képet a PDF-hez
         pdf.addImage(await Buffer.from(base64Image, 'base64'), 'JPEG', 0, 10, 200, 280);
         // Mentem a PDF-et a felhasználónak
-        pdf.save('pdf_with_image.pdf');
+        pdf.save('analytics.pdf');
       }
     }
   };
