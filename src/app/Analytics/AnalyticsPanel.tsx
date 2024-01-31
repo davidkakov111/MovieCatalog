@@ -100,9 +100,9 @@ const AnalyticsPanelForm: React.FC = () => {
   };
 
   // Dinamikus szélességek a diagramokhoz
-  const outerRadius = window.innerWidth / 10
-  const circlecontainerWidth = window.innerWidth < 600 ? window.innerWidth / 1.4 : window.innerWidth / 2.8;
+  // const circlecontainerWidth = window.innerWidth < 600 ? window.innerWidth / 1.4 : window.innerWidth / 2.8;
   const barcontainerWidth =  window.innerWidth < 900 ? window.innerWidth : window.innerWidth / 1.5;
+  const circlecontainerWidth = barcontainerWidth / 2.5
 
   // Random szín generálása a kör diagramokhoz  
   const generateRandomColor = () => randomColor();
@@ -137,7 +137,7 @@ const AnalyticsPanelForm: React.FC = () => {
           </BarChart>
         </div>
         {/* Kör diagramok kategóriák és filmek népszerűségéhez */}
-        <div style={{ display: 'flex', flexDirection: window.innerWidth < 600 ? 'column' : 'row' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
           <div>
             <br />
             <h2 style={{ textAlign: 'center' }}>Kategóriák népszerűsége</h2>
@@ -148,7 +148,7 @@ const AnalyticsPanelForm: React.FC = () => {
                 nameKey="Kategória"
                 cx="50%"
                 cy="50%"
-                outerRadius={outerRadius}
+                outerRadius={circlecontainerWidth / 2.5}
                 label
               >
                 {FilmData.map((entry, index) => (
@@ -156,7 +156,6 @@ const AnalyticsPanelForm: React.FC = () => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
             </PieChart>
             <br />
           </div>
@@ -170,7 +169,7 @@ const AnalyticsPanelForm: React.FC = () => {
                 nameKey="cim"
                 cx="50%"
                 cy="50%"
-                outerRadius={outerRadius}
+                outerRadius={circlecontainerWidth / 2.5}
                 label
               >
                 {FilmData.map((entry, index) => (
@@ -178,7 +177,6 @@ const AnalyticsPanelForm: React.FC = () => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
             </PieChart>
             <br />
           </div>
