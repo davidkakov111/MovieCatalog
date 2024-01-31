@@ -141,28 +141,22 @@ export async function getFilmById(id: number) {
   }
 }
 
-// Filmek címének lekérdezése a "filmek" tábla "cim" oszlopából
-export async function getfilmbycim() {
-  const connection = await pool.getConnection();
-  try {
-    const rows = await connection.query('SELECT cim FROM filmek');
-    if ([rows].length === 0) {
-      return null;
-    }
-    return rows;
-  } catch (error) {
-    console.error('Hiba a lekerdezes kozben:', error);
-    return null;
-  } finally {
-    connection.release();
-  }
-}
-
 // Összes felhasználó lekérése
 export async function getAllUsers() {
   const connection = await pool.getConnection();
   try {
     const results = await connection.query('SELECT * FROM users');
+    return results[0];
+  } finally {
+    connection.release();
+  }
+}
+
+// Összes film lekérése
+export async function getAllFilm() {
+  const connection = await pool.getConnection();
+  try {
+    const results = await connection.query('SELECT * FROM filmek');
     return results[0];
   } finally {
     connection.release();
