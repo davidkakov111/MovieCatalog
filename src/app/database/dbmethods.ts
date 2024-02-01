@@ -42,8 +42,8 @@ export async function updateFilmByID(Updated_film: any): Promise<string> {
   const connection = await pool.getConnection();
   try {
     // Frissíem a filmet
-    await connection.query('UPDATE filmek SET cim = ?, leiras = ?, poszter_url = ?, kategoria = ?, kepek = ? WHERE id = ?', 
-      [Updated_film.cim, Updated_film.leiras, Updated_film.poszter_url, Updated_film.kategoria, Updated_film.kepek, Updated_film.id]);
+    await connection.query('UPDATE filmek SET cim = ?, leiras = ?, poszter_url = ?, kategoria = ?, kepek1 = ?, kepek2 = ?, kepek3 = ?, kepek4 = ?, kepek5 = ? WHERE id = ?', 
+      [Updated_film.cim, Updated_film.leiras, Updated_film.poszter_url, Updated_film.kategoria, Updated_film.kepek1, Updated_film.kepek2, Updated_film.kepek3, Updated_film.kepek4, Updated_film.kepek5, Updated_film.id]);
     return 'Sikeres frissítés';
   } catch (error) {
     console.error('Hiba a frissítés közben:', error);
@@ -167,11 +167,11 @@ export async function getAllFilm() {
 export async function createFilmRecord(movieData: any): Promise<string> {
   const connection = await pool.getConnection();
   try {
-      // SQL insert parancs létrehozása és végrehajtása az értékekkel
-      const sql = 'INSERT INTO filmek (cim, leiras, megjelenes_datuma, poszter_url, kategoria) VALUES (?, ?, ?, ?, ?)';
-      const values = [movieData.cim, movieData.leiras, movieData.megjelenes_datuma, movieData.poszter_url, movieData.kategoria];
-      await connection.execute(sql, values);
-      return 'Rekord sikeresen letrehozva!';
+    // SQL insert parancs létrehozása és végrehajtása az értékekkel
+    const sql = 'INSERT INTO filmek (cim, leiras, megjelenes_datuma, poszter_url, kategoria, kepek1, kepek2, kepek3, kepek4, kepek5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const values = [movieData.cim, movieData.leiras, movieData.megjelenes_datuma, movieData.poszter_url, movieData.kategoria, movieData.kepek1, movieData.kepek2, movieData.kepek3, movieData.kepek4, movieData.kepek5];
+    await connection.execute(sql, values);
+    return 'Rekord sikeresen letrehozva!';
   } catch (error:any) {
     if (error.code === 'ER_DUP_ENTRY') {
       return 'Meglevo film';
@@ -220,9 +220,13 @@ export async function createFilmsTable() {
         rated_user_ids TEXT,
         kategoria ENUM('Akció', 'Vígjáték', 'Dráma', 'Horror', 'Sci-fi') NOT NULL,
         reviews INT DEFAULT 0,
-        kepek TEXT,
+        kepek1 TEXT,
         rate_dates TEXT,
         review_dates TEXT
+        kepek2 TEXT,
+        kepek3 TEXT,
+        kepek4 TEXT,
+        kepek5 TEXT,
       );
     `);
     return 'success';

@@ -7,6 +7,11 @@ const FilmForm: React.FC = () => {
   const [leiras, setLeiras] = useState<string>('');
   const [poszterUrl, setPoszterUrl] = useState<string>('');
   const [selectedKategoria, setSelectedKategoria] = useState<string>('');
+  const [kepekUrl1, setKepekUrl1] = useState('');
+  const [kepekUrl2, setKepekUrl2] = useState('');
+  const [kepekUrl3, setKepekUrl3] = useState('');
+  const [kepekUrl4, setKepekUrl4] = useState('');
+  const [kepekUrl5, setKepekUrl5] = useState('');
 
   const kategoriak = ['Akció', 'Vígjáték', 'Dráma', 'Horror', 'Sci-fi'];
 
@@ -15,13 +20,13 @@ const FilmForm: React.FC = () => {
     e.preventDefault();
 
     // Ellenőrzések
-    if (!cim || !leiras || !poszterUrl.toString() || !selectedKategoria) {
-      alert('Minden mező kitöltése kötelező, és az értékelés csak 0 és 10 közötti szám lehet!');
+    if (!cim || !leiras || !poszterUrl || !selectedKategoria || !kepekUrl1 || !kepekUrl2 || !kepekUrl3 || !kepekUrl4 || !kepekUrl5) {
+      alert('Minden mező kitöltése kötelező!');
       return;
     }
 
     if (cim.length > 255 || poszterUrl.length > 255) {
-      alert('A cím és az URL legfeljebb 255 karakter lehet!');
+      alert('A cím és a poszter URL legfeljebb 255 karakter lehet!');
       return;
     }
 
@@ -39,6 +44,11 @@ const FilmForm: React.FC = () => {
         "megjelenes_datuma": megjelenesDatuma,
         "poszter_url": poszterUrl,
         "kategoria": selectedKategoria,
+        "kepek1": kepekUrl1,
+        "kepek2": kepekUrl2,
+        "kepek3": kepekUrl3,
+        "kepek4": kepekUrl4,
+        "kepek5": kepekUrl5
       };
       
       // El küldöm a POST kérést a backend-nek
@@ -105,7 +115,39 @@ const FilmForm: React.FC = () => {
           className="w-full mt-1 p-2 bg-white border rounded"
         />
       </label>
-
+      <label className="block mb-2 text-black">
+        Kép URLs:
+        <input
+          type="text"
+          value={kepekUrl1}
+          onChange={(e) => setKepekUrl1(e.target.value)}
+          className="w-full mt-1 p-2 bg-white border rounded"
+        />
+        <input
+          type="text"
+          value={kepekUrl2}
+          onChange={(e) => setKepekUrl2(e.target.value)}
+          className="w-full mt-1 p-2 bg-white border rounded"
+        />
+        <input
+          type="text"
+          value={kepekUrl3}
+          onChange={(e) => setKepekUrl3(e.target.value)}
+          className="w-full mt-1 p-2 bg-white border rounded"
+        />
+        <input
+          type="text"
+          value={kepekUrl4}
+          onChange={(e) => setKepekUrl4(e.target.value)}
+          className="w-full mt-1 p-2 bg-white border rounded"
+        />
+        <input
+          type="text"
+          value={kepekUrl5}
+          onChange={(e) => setKepekUrl5(e.target.value)}
+          className="w-full mt-1 p-2 bg-white border rounded"
+        />
+      </label>
       {/* Leírás textarea */}
       <label className="block mb-2 text-black">
         Leírás:

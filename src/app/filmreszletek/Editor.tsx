@@ -18,7 +18,11 @@ const EditorFilmReszletek: React.FC = () => {
   // State változók inicializálása a film adataival
   const [cim, setCim] = useState('');
   const [poszterUrl, setPoszterUrl] = useState('');
-  const [kepekUrl, setKepekUrl] = useState('');
+  const [kepekUrl1, setKepekUrl1] = useState('');
+  const [kepekUrl2, setKepekUrl2] = useState('');
+  const [kepekUrl3, setKepekUrl3] = useState('');
+  const [kepekUrl4, setKepekUrl4] = useState('');
+  const [kepekUrl5, setKepekUrl5] = useState('');
   const [leiras, setLeiras] = useState('');
   const [selectedKategoria, setKategoria] = useState('');
   const [filmDetails, setFilmDetails] = useState<any | null>(null);
@@ -47,7 +51,11 @@ const EditorFilmReszletek: React.FC = () => {
         setPoszterUrl(DATA.poszter_url);
         setLeiras(DATA.leiras);
         setKategoria(DATA.kategoria);
-        setKepekUrl(DATA.kepek);
+        setKepekUrl1(DATA.kepek1);
+        setKepekUrl2(DATA.kepek2);
+        setKepekUrl3(DATA.kepek3);
+        setKepekUrl4(DATA.kepek4);
+        setKepekUrl5(DATA.kepek5);
         setIsLoading(false);
       } catch (error) {
         console.error('Hiba történt a film részleteinek lekérése közben:', error);
@@ -63,6 +71,11 @@ const EditorFilmReszletek: React.FC = () => {
     e.preventDefault();
 
     try {
+      // Ellenőrzések
+      if (!cim || !leiras || !poszterUrl || !selectedKategoria || !kepekUrl1 || !kepekUrl2 || !kepekUrl3 || !kepekUrl4 || !kepekUrl5) {
+        alert('Minden mező kitöltése kötelező!');
+        return;
+      }
       // Új adatok objektumának létrehozása
       const newData = {
         id: film_adatok?.id,
@@ -70,9 +83,12 @@ const EditorFilmReszletek: React.FC = () => {
         leiras: leiras,
         poszter_url: poszterUrl,
         kategoria: selectedKategoria,
-        kepek: kepekUrl,
+        kepek1: kepekUrl1,
+        kepek2: kepekUrl2,
+        kepek3: kepekUrl3,
+        kepek4: kepekUrl4,
+        kepek5: kepekUrl5,
       };
-
       // Backend felé történő adatküldés POST kérés segítségével
       const response = await fetch('/api/updateFilmRecord', {
         method: 'POST',
@@ -151,11 +167,35 @@ const EditorFilmReszletek: React.FC = () => {
           />
         </label>
         <label className="block mb-2 text-black">
-          Kép URL(s):
+          Kép URLs:
           <input
             type="text"
-            value={kepekUrl}
-            onChange={(e) => setKepekUrl(e.target.value)}
+            value={kepekUrl1}
+            onChange={(e) => setKepekUrl1(e.target.value)}
+            className="w-full mt-1 p-2 bg-white border rounded"
+          />
+          <input
+            type="text"
+            value={kepekUrl2}
+            onChange={(e) => setKepekUrl2(e.target.value)}
+            className="w-full mt-1 p-2 bg-white border rounded"
+          />
+          <input
+            type="text"
+            value={kepekUrl3}
+            onChange={(e) => setKepekUrl3(e.target.value)}
+            className="w-full mt-1 p-2 bg-white border rounded"
+          />
+          <input
+            type="text"
+            value={kepekUrl4}
+            onChange={(e) => setKepekUrl4(e.target.value)}
+            className="w-full mt-1 p-2 bg-white border rounded"
+          />
+          <input
+            type="text"
+            value={kepekUrl5}
+            onChange={(e) => setKepekUrl5(e.target.value)}
             className="w-full mt-1 p-2 bg-white border rounded"
           />
         </label>
