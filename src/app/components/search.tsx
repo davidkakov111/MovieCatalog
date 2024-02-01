@@ -11,25 +11,31 @@ interface SearchProps {
 
 // A Search komponens definíciója
 export default function Search({ placeholder, extracted }: SearchProps) {
+
   // Dinamikus importálás, hogy lazy loadingal legyen megoldva a filmek feltöltése  
   const FilmKomponens = dynamic(() => import('./filmkomponents'), { ssr: false }); 
+
   // A keresőmezőbe beírt kifejezés
   const [searchTerm, setSearchTerm] = useState<string>(''); 
   // Szűrt filmek állapota
   const [filteredMovies, setFilteredMovies] = useState<RowDataPacket[]>([]); 
+
   useEffect(() => {
     handleSearch();
   }, [searchTerm]); // Az useEffect csak akkor fut le, ha a searchTerm állapota változik
+
   // A keresés kezelése
   function handleSearch() {
     if (searchTerm.trim() === '') {
       setFilteredMovies([]);
       return;
     }
+
     // A filmek szűrése a cím alapján
     const filtered = extracted.filter((movie: RowDataPacket) => {
       return movie.cim.toLowerCase().includes(searchTerm.toLowerCase());
     });
+
     setFilteredMovies(filtered);
   }
 

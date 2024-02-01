@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
+// Sign-in form kompónens 
 const SignInForm = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -26,13 +27,14 @@ const SignInForm = () => {
     // Sikeres ellenőrzés esetén folytatódhat a bejelentkezés
     const response = await signIn('credentials', { email: formData.email, password: formData.password, redirect: false });
     if(!response?.error) {
-        router.push("/")
-        router.refresh()
+      router.push("/")
+      router.refresh()
     } else {
-        alert("Helytelen bejelentkezési adatok")
+      alert("Helytelen bejelentkezési adatok")
     }
   };
 
+  // Állapot kezelő
   const handleChange = (e: any) => {
     setFormData({
       ...formData,

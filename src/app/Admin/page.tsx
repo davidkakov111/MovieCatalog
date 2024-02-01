@@ -16,13 +16,13 @@ export default async function AdminPage() {
         // Ha a felhasználó be van jelentkezve, de nem admin, átirányítom a kezdőoldalra
         if (session.user?.image !== "Admin") {
             redirect("/");
+        } else {
+            // Ha a felhasználó admin, megjelenítem az AdminPanel komponenst
+            return (
+                <div>
+                    <AdminPanel />
+                </div>
+            );
         }
     }
-
-    // Ha az ellenőrzések sikeresek, megjelenítem az AdminPanel komponenst
-    return (
-        <div>
-            <AdminPanel />
-        </div>
-    );
 };

@@ -3,13 +3,16 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
+// Sign-up form kompónens
 const SignUpForm = () => {
+  // Router és állapot inicializálás
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
+  // A regisztrációért felelős függvény
   const handleSignUp = async () => {
     // Email ellenőrzése
     if (!formData.email.includes('@')) {
@@ -29,7 +32,7 @@ const SignUpForm = () => {
       return;
     }
 
-    // Az ellenőrzéseket sikeresen átmentve, elküldöm a regisztrációs kérést
+    // Az ellenőrzéseken sikeresen átmenve, elküldöm a regisztrációs kérést
     const databaseResponse = await fetch('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify({
@@ -38,6 +41,7 @@ const SignUpForm = () => {
       }),
     });
 
+    // Sikeres regisztráció esetén bejelentkeztetem a felhasználót
     if (databaseResponse.ok) {
       const response = await signIn('credentials', { email: formData.email, password: formData.password, redirect: false });
       if(!response?.error) {
@@ -56,6 +60,7 @@ const SignUpForm = () => {
     };
   };
 
+  // Állapot kezelő
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,

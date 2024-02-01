@@ -1,7 +1,9 @@
 "use client"
 import React, { useState } from 'react';
 
+// Kompónens, új filmek létrehozásához
 const FilmForm: React.FC = () => {
+
   // Állapotok inicializálása
   const [cim, setCim] = useState<string>('');
   const [leiras, setLeiras] = useState<string>('');
@@ -13,18 +15,20 @@ const FilmForm: React.FC = () => {
   const [kepekUrl4, setKepekUrl4] = useState('');
   const [kepekUrl5, setKepekUrl5] = useState('');
 
+  // Film kategóriák
   const kategoriak = ['Akció', 'Vígjáték', 'Dráma', 'Horror', 'Sci-fi'];
 
   // Űrlap beküldés kezelése
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Ellenőrzések
+    // Nem megengedett az üresen hagyott mező
     if (!cim || !leiras || !poszterUrl || !selectedKategoria || !kepekUrl1 || !kepekUrl2 || !kepekUrl3 || !kepekUrl4 || !kepekUrl5) {
       alert('Minden mező kitöltése kötelező!');
       return;
     }
 
+    // Maximum hossz ellenőrzése
     if (cim.length > 255 || poszterUrl.length > 255) {
       alert('A cím és a poszter URL legfeljebb 255 karakter lehet!');
       return;
@@ -59,7 +63,10 @@ const FilmForm: React.FC = () => {
         },
         body: JSON.stringify(result),
       });
+
+      // Válasz json formátumban
       const responseData = await response.json();
+
       if (response.ok) {
         // Sikeres válasz esetén megjelenítem a felhasználónak az üzenetet
         alert(`A film sikeresen elmentve!`);

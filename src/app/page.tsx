@@ -29,6 +29,7 @@ const Otthon: React.FC = () => {
             'Content-Type': 'application/json',
           },
         });
+
         // Ellenőrzés, hogy a kérés sikeres volt-e
         if (response.ok) {
           // JSON válasz beolvasása
@@ -78,8 +79,10 @@ const Otthon: React.FC = () => {
               HotTopicIndex: reviewDatesCount + (rateDatesCount * 5),
             };
           });
+
           // Filmek a felkapottsági szám alapján, csökkenő sorrendben
           Hotfilms.sort((a, b) => b.HotTopicIndex - a.HotTopicIndex);
+          
           // A top 5 filmek kiválasztása felkapottsági szám alapján
           const top5Film =Hotfilms.slice(0, 5).map((item) => item.film);
           setHotTopicFilmData(top5Film)

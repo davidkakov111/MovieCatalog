@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Ellenőrizem, hogy a kérés típusa POST-e
     if (req.method !== 'POST') {
       // Ha nem, akkor visszaküldök egy hibát
-      return res.status(405).json({ message: 'Method Not Allowed! (Use POST!)' });
+      return res.status(405).json({ message: 'Method Not Allowed!' });
     }
     
     // A film adatokat a kérés testéből kinyerem

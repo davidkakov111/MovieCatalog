@@ -31,7 +31,7 @@ const handler = NextAuth({
             // Jelszó összehasonlítás a tárolt jelszóval
             const passwordCorrect = await compare(credentials?.password, user.password);
 
-            // Jelszó helyes, visszatérés felhasználói adatokkal
+            // Ha a jelszó helyes, visszatérés a felhasználói adatokkal
             if (passwordCorrect) {
                 return {
                     id: user.id,

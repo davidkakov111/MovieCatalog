@@ -14,7 +14,8 @@ export default async function getAllUsersAPI(req: NextApiRequest, res: NextApiRe
         // Meghívom a getAllUsers függvényt, ami a felhasználók adatait kéri le
         const result: any = await getAllUsers();
         
-        // Töröljöm a jelszavakat az eredményből
+        // Törölöm a jelszavakat az eredményből, mert azokat kockázatos lenne kiadni 
+        // a frontendnek még így is, hogy hashelve vannak
         const usersWithoutPasswords = result.map((user: { password: any, [key: string]: any }) => {
             const { password, ...userWithoutPassword } = user;
             return userWithoutPassword;

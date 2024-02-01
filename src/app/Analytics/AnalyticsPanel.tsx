@@ -6,6 +6,7 @@ import randomColor from 'randomcolor';
 import * as htmlToImage from 'html-to-image';
 import jsPDF from 'jspdf';
 
+// Analytics panel kompónens
 const AnalyticsPanelForm: React.FC = () => {
   // State-ek inicializálása
   const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0);
@@ -60,15 +61,24 @@ const AnalyticsPanelForm: React.FC = () => {
     fetchData();
   }, [windowWidth]);  // Frissítés csak akkor, ha a windowWidth megváltozik
 
-  // Kategória adatok feldolgozása
+  // Ez a függvény filmadatokból kinyeri az egyes filmkategóriákhoz tartozó értékeket
+  // és egy új tömbben tárolva visszaadja azokat.
   const extractCategoryData = (filmData: RowDataPacket[]): RowDataPacket[] => {
+    // Film kategóriák definiálása
     const categories = ['Akció', 'Vígjáték', 'Dráma', 'Horror', 'Sci-fi'];
+
+    // Kategóriákon végigiterálva előállítja az új tömböt
     const category_data = categories.map((category) => {
+      // A kategóriához tartozó filmek számának összegzése
       const reviews = filmData
         .filter((film) => film.kategoria === category)
         .reduce((total, film) => total + film.reviews, 0);
+
+      // Visszaadja az objektumot, mely tartalmazza a kategóriát és az összesített értékeket
       return { Kategória: category, reviews };
     }) as RowDataPacket[];
+
+    // Az elkészült tömb visszaadása
     return category_data;
   };
 
@@ -83,24 +93,26 @@ const AnalyticsPanelForm: React.FC = () => {
 
   // Az összes adat PDF fájlba való exportálása
   const generatePdf = async () => {
+    // Ha megvan az összes adat
     if (FilmData && CategoryData) {
       const chartContainer = document.getElementById('ChartContainer');
+      // Ha a chartcontainer meg van jelenítve
       if (chartContainer !== null) {
-        // Elkészítem a képet a diagramokról
+        // Elkészítem a képet a diagramokról, hogy az összes adatot PDF-be tudjam exportálni
         const pngUrl = await htmlToImage.toPng(chartContainer);
+        // A base64 formátumu png url első részét kitörlöm
         const base64Image = pngUrl.replace(/^data:image\/png;base64,/, '');
         // Létrehozok egy új jsPDF objektumot
         const pdf = new jsPDF();
         // Hozzáadom a képet a PDF-hez
         pdf.addImage(await Buffer.from(base64Image, 'base64'), 'JPEG', 0, 10, 200, 280);
-        // Mentem a PDF-et a felhasználónak
+        // Mentem a PDF-et a felhasználónak "analytics.pdf" néven
         pdf.save('analytics.pdf');
       }
     }
   };
 
-  // Dinamikus szélességek a diagramokhoz
-  // const circlecontainerWidth = window.innerWidth < 600 ? window.innerWidth / 1.4 : window.innerWidth / 2.8;
+  // Szélességek definiálása a diagramokhoz
   const barcontainerWidth =  window.innerWidth < 900 ? window.innerWidth : window.innerWidth / 1.5;
   const circlecontainerWidth = barcontainerWidth / 2.5
 
@@ -112,7 +124,7 @@ const AnalyticsPanelForm: React.FC = () => {
       <div className="text-3xl font-bold">Statisztikák</div>
       <br />
       <div id="ChartContainer">
-        {/* Oszlop diagram a filmek népszerűségéhez */}
+        {/* Oszlop diagram a filmeknek */}
         <div>
           <h2 style={{ textAlign: 'center' }}>Filmek népszerűsége megjelenésük óta</h2>
           <BarChart width={barcontainerWidth} height={barcontainerWidth / 2.5} data={FilmData}>
@@ -125,7 +137,7 @@ const AnalyticsPanelForm: React.FC = () => {
         </div>
         <br />
         <br />
-        {/* Oszlop diagram a kategóriák népszerűségéhez */}
+        {/* Oszlop diagram a kategóriáknak */}
         <div>
           <h2 style={{ textAlign: 'center' }}>Kategóriák népszerűsége megjelenésük óta</h2>
           <BarChart width={barcontainerWidth} height={barcontainerWidth / 2.5} data={CategoryData}>
@@ -136,7 +148,7 @@ const AnalyticsPanelForm: React.FC = () => {
             <Bar dataKey="reviews" fill="#82ca9d" />
           </BarChart>
         </div>
-        {/* Kör diagramok kategóriák és filmek népszerűségéhez */}
+        {/* Kör diagramok kategóriáknak és a filmeknek*/}
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
           <div>
             <br />
@@ -183,6 +195,7 @@ const AnalyticsPanelForm: React.FC = () => {
         </div>
       </div>
       <br />
+      {/* Ezzel a gombal tudja a felhasználó letölteni a PDF-et */}
       <button
         onClick={generatePdf}
         className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full text-3xl transition duration-300 ease-in-out transform hover:scale-105"

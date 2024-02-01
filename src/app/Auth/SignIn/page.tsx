@@ -7,7 +7,7 @@ export default async function SignInPage() {
   // Session lekérése
   const session = await getServerSession();
 
-  // Ha a felhasználó már be van jelentkezve, átirányítjuk a főoldalra
+  // Ha a felhasználó már be van jelentkezve, átirányítjom a főoldalra
   if (session) {
     redirect("/");
   }

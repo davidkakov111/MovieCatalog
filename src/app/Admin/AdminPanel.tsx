@@ -57,7 +57,7 @@ const AdminPanel = () => {
       // A válasz a backend-től JSON formátumban
       const responseData = await response.json();
 
-      // Ha a válasz rendben van, frissíti a felhasználók állapotát és megjeleníti az új típust
+      // Ha a válasz rendben van, frissítem a felhasználók állapotát és megjelenítem az új típust
       if (response.ok) {
         // Az állapot frissítése a friss adatokkal
         setUsers((prevUsers) =>

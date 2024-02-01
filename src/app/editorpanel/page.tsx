@@ -2,23 +2,23 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import FilmForm from './FilmForm';
 
-// Ez a függvény az oldal komponensét definiálja
+// Ez a függvény az új film létrehozása oldalt definiálja
 export default async function FilmDetails() {
   // Szerveroldali session lekérése
   const session = await getServerSession();
 
-  // Ellenőrzés: Ha nincs session, átirányítás a kezdőlapra
+  // Ha nincs session, átirányítom a kezdőlapra a felhasználót
   if (!session) {
     redirect("/");
   } else {
-    // Ellenőrzés: Ha a felhasználó nem "Editor", átirányítás a kezdőlapra
+    // Ha a felhasználó nem "Editor", átirányítom a kezdőlapra
     if (session.user?.image !== "Editor") {
       redirect("/");
+    } else {
+      // Ha minden ellenőrzés sikeres, megjelenítem a FilmForm komponenst
+      return (
+        <FilmForm />
+      );
     }
   }
-
-  // Ha minden ellenőrzés sikeres, megjelenítem a FilmForm komponenst
-  return (
-    <FilmForm />
-  );
 }

@@ -126,14 +126,20 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
     );
   }
 
-  // Ha nincsenek adatok, akkor üzenet megjelenítése
+  // Ha nincsenek adatok a filmől, akkor közlöm 
   if (!filmDetails) {
-    return <h1>Nincsenek adatok a filmről!</h1>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <h1 className="text-center">Nincsenek adatok a filmről!</h1>
+      </div>
+    );
   }
 
   // Film adatainak előkészítése
   const film_adatok = filmDetails[0][0];
   const formattedDate = new Date(film_adatok.megjelenes_datuma).toLocaleDateString();
+
+  // Itt limitálom le az értékelési tartományt 1 - 100-ig
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let inputValue = parseInt(e.target.value, 10);
 
@@ -143,27 +149,33 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
     }
   };
 
+  // Értékelés beküldése esetén
   const handleClick = async () => {
     if (ertekelesInput === '') {
-        alert("Az értékelés nem lehet üres!")
+      alert("Az értékelés nem lehet üres!")
     } else {
       // A jelenlegi idő pecsét
       const timestamp: number = Math.floor(Date.now() / 1000);
       if (film_adatok.rated_user_ids === null) {
         // Még nem kapott ez a film értékelést
-        // Az új user id array, amiben az értékelésiket leadott felhasználók szerepelnek
+        // Az új user id tömb, amiben az értékeléseiket leadott felhasználók szerepelnek
         const Array = [UserID];
         const rated_user_ids = `[${Array.map(item => String(item)).join(', ')}]`;
-        // Az új rate dates array, amiben az értékelés leadásának időpontjai szerepelnek
+        // Az új rate dates array, amiben az értékelések leadásának időpontjai szerepelnek
         const dateArray = [timestamp];
         const rate_dates = `[${dateArray.map(item => String(item)).join(', ')}]`;
+
+        // Adat az API számára
         const update_rateing = {
           film_id: film_adatok.id,
           film_ertekeles: ertekelesInput,
           film_rated_user_ids: rated_user_ids,
           rate_dates: rate_dates,
-        }
+        };
+
+        // Frissítem az értékelést
         const response = await UpdateRateing(update_rateing)
+
         if (response !== null &&  response.ok) {
           // Sikeres válasz esetén a főoldalra irányítom a felhasználót
           router.push("/")
@@ -176,21 +188,32 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
         }
       } else {
         // Ennek a filmnek már vannak értékelései
+
+        // Új értékelés
         const UjErtekeles: any = ertekelesInput
-        // A string array-t visszaállítom 
+
+        // A string tömböt visszaállítom 
         const rated_user_ids = eval(film_adatok.rated_user_ids) as number[];
-        // Ennyi alkalommal kapott értékelést a film
+
+        // "NrOfRatings" alkalommal kapott értékelést a film
         const NrOfRatings = rated_user_ids.length;
+
         // A film új átlag értékelése
         const film_ertekeles = ((film_adatok.ertekeles * NrOfRatings) + UjErtekeles) / (NrOfRatings + 1)
+        
         // Az értékelő felhasználó id-ját is belteszem a többi közé, hogy kétszer ne tudjon egy filmet értékelni
         rated_user_ids.push(UserID);
+
         // Viszaállítom az arrayt stringé hogy elmenthessem az adatbázisba
         const RatedUserIds = `[${rated_user_ids.map(item => String(item)).join(', ')}]`;
-        // A string array-t visszaállítom, ami az értékelések datumát menti
+
+        // A string tömböt visszaállítom, ami az értékelések datumát menti és belerakom az újat
         const ratedates = eval(film_adatok.rate_dates) as number[];
         ratedates.push(timestamp);
+
+        // Visszaállítom string tömbé
         const rate_dates = `[${ratedates.map(item => String(item)).join(', ')}]`;
+
         // Összeállított adat az API számára
         const update_rateing = {
             film_id: film_adatok.id,
@@ -212,156 +235,104 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
       }
     }
   };
-  if (film_adatok.rated_user_ids === null) {
-    // Film részletek megjelenítése értékelés opcióval
-    return (
-      <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-300 rounded-md">
+
+  // Film részletek megjelenítése értékelés opcióval
+  const renderFilmDetailsWithRating = () => (
+    <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-300 rounded-md">
       <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
       <div className="flex">
-        <div className="flex-1 w-60 overflow-hidden">
-          <div className="relative" style={{ paddingBottom: '100%' }}>
-            <div className="absolute inset-0">
-              <img src={film_adatok.poszter_url} className="w-full h-full object-cover aspect-content"/>
-            </div>
-          </div>
-        </div>
-        <div className="flex-1 w-60 overflow-hidden">
-          <div className="relative" style={{ paddingBottom: '100%' }}>
-            <div className="absolute inset-0">
-              <SlideShow
-                images={[
-                  film_adatok.kepek1,
-                  film_adatok.kepek2,
-                  film_adatok.kepek3,
-                  film_adatok.kepek4,
-                  film_adatok.kepek5,
-                ]}
-                interval={1000}
-              />
-            </div>
-          </div>
-        </div>
+        {renderImageSection()}
+        {renderSlideShowSection()}
+      </div>
+      <p className="text-gray-700 mt-4 mb-4">Megjelenés dátuma: {formattedDate}</p>
+      <p className="text-gray-700">A film átlag értékelése: {renderAverageRating()}</p>
+      {renderRatingInputSection()}
+      <p className="text-gray-700 mt-5">{film_adatok.leiras}</p>
+    </div>
+  );
+
+  // Film részletek megjelenítése értékelés opció nélkül
+  const renderFilmDetailsWithoutRating = () => (
+    <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-300 rounded-md">
+      <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
+      <div className="flex">
+        {renderImageSection()}
+        {renderSlideShowSection()}
       </div>
       <p className="text-gray-700 mt-4 mb-4">Megjelenés dátuma: {formattedDate}</p>
       <p className="text-gray-700">
-        A film átlag értékelése: {Math.round(film_adatok.ertekeles)}/100
+        A film átlag értékelése: {renderAverageRating()} (Te már egyszer értékelted)
       </p>
-      {/* Input mező hozzáadása */}
-      <input
-          type="number"
-          min="1"
-          max="100"
-          placeholder="Értékelés"
-          value={ertekelesInput}
-          onChange={handleChange}
-          className="mr-2 px-4 py-2 border border-gray-300 rounded"
-      />
-      {/* Gomb hozzáadása */}
-      <button
-          className="bg-yellow-500 text-white px-4 py-2 rounded"
-          onClick={handleClick}
-      >
-          Beküld
-      </button>
-      
       <p className="text-gray-700 mt-5">{film_adatok.leiras}</p>
+    </div>
+  );
+
+  // Értékelés opcióval rendelkező rész megjelenítése
+  const renderRatingInputSection = () => (
+    <>
+      <input
+        type="number"
+        min="1"
+        max="100"
+        placeholder="Értékelés"
+        value={ertekelesInput}
+        onChange={handleChange}
+        className="mr-2 px-4 py-2 border border-gray-300 rounded"
+      />
+      <button
+        className="bg-yellow-500 text-white px-4 py-2 rounded"
+        onClick={handleClick}
+      >
+        Beküld
+      </button>
+    </>
+  );
+
+  // Átlagos értékelés megjelenítése
+  const renderAverageRating = () => (
+    <>{Math.round(film_adatok.ertekeles)}/100</>
+  );
+
+  // Kép megjelenítéséért felelős rész
+  const renderImageSection = () => (
+    <div className="flex-1 w-60 overflow-hidden">
+      <div className="relative" style={{ paddingBottom: '100%' }}>
+        <div className="absolute inset-0">
+          <img src={film_adatok.poszter_url} className="w-full h-full object-cover aspect-content"/>
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
+
+  // Diavetítés megjelenítéséért felelős rész
+  const renderSlideShowSection = () => (
+    <div className="flex-1 w-60 overflow-hidden">
+      <div className="relative" style={{ paddingBottom: '100%' }}>
+        <div className="absolute inset-0">
+          <SlideShow
+            images={[
+              film_adatok.kepek1,
+              film_adatok.kepek2,
+              film_adatok.kepek3,
+              film_adatok.kepek4,
+              film_adatok.kepek5,
+            ]}
+            interval={1000}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  // A már értékeléseiket leadott felhasználók id-jei
   const arrayFromStr = eval(film_adatok.rated_user_ids) as number[];
-  if (arrayFromStr.includes(UserID)) {
-    // Film részletek megjelenítése értékelés opció nélkül
-    return (
-        <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-300 rounded-md">
-        <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
-        <div className="flex">
-          <div className="flex-1 w-60 overflow-hidden">
-            <div className="relative" style={{ paddingBottom: '100%' }}>
-              <div className="absolute inset-0">
-                <img src={film_adatok.poszter_url} className="w-full h-full object-cover aspect-content"/>
-              </div>
-            </div>
-          </div>
-          <div className="flex-1 w-60 overflow-hidden">
-            <div className="relative" style={{ paddingBottom: '100%' }}>
-              <div className="absolute inset-0">
-                <SlideShow
-                  images={[
-                    film_adatok.kepek1,
-                    film_adatok.kepek2,
-                    film_adatok.kepek3,
-                    film_adatok.kepek4,
-                    film_adatok.kepek5,
-                  ]}
-                  interval={1000}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <p className="text-gray-700 mt-4 mb-4">Megjelenés dátuma: {formattedDate}</p>
-        <p className="text-gray-700">
-            A film átlag értékelése: {Math.round(film_adatok.ertekeles)}/100 (Te már egyszer értékelted)
-        </p>
-        <p className="text-gray-700 mt-5">{film_adatok.leiras}</p>
-        </div>
-    );
-  } else {
-    // Film részletek megjelenítése értékelés opcióval
-    return (
-        <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-300 rounded-md">
-        <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
-        <div className="flex">
-          <div className="flex-1 w-60 overflow-hidden">
-            <div className="relative" style={{ paddingBottom: '100%' }}>
-              <div className="absolute inset-0">
-                <img src={film_adatok.poszter_url} className="w-full h-full object-cover aspect-content"/>
-              </div>
-            </div>
-          </div>
-          <div className="flex-1 w-60 overflow-hidden">
-            <div className="relative" style={{ paddingBottom: '100%' }}>
-              <div className="absolute inset-0">
-                <SlideShow
-                  images={[
-                    film_adatok.kepek1,
-                    film_adatok.kepek2,
-                    film_adatok.kepek3,
-                    film_adatok.kepek4,
-                    film_adatok.kepek5,
-                  ]}
-                  interval={1000}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <p className="text-gray-700 mt-4 mb-4">Megjelenés dátuma: {formattedDate}</p>
-        <p className="text-gray-700">
-          A film átlag értékelése: {Math.round(film_adatok.ertekeles)}/100
-        </p>
-        {/* Input mező hozzáadása */}
-        <input
-            type="number"
-            min="1"
-            max="100"
-            placeholder="Értékelés"
-            value={ertekelesInput}
-            onChange={handleChange}
-            className="mr-2 px-4 py-2 border border-gray-300 rounded"
-        />
-        {/* Gomb hozzáadása */}
-        <button
-            className="bg-yellow-500 text-white px-4 py-2 rounded"
-            onClick={handleClick}
-        >
-            Beküld
-        </button>
-        
-        <p className="text-gray-700 mt-5">{film_adatok.leiras}</p>
-        </div>
-    );
-  }
+
+  // Döntés a megjelenítendő részlet alapján
+  return film_adatok.rated_user_ids === null
+    ? renderFilmDetailsWithRating()
+    : arrayFromStr.includes(UserID)
+      ? renderFilmDetailsWithoutRating()
+      : renderFilmDetailsWithRating();
 };
 
 export default RateFilmReszletek;

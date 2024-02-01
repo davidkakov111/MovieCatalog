@@ -21,6 +21,7 @@ const FilmReszletek: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // URL paraméterek lekérése
     const urlParams = new URLSearchParams(window.location.search);
     const cim = urlParams.get('title');
 
@@ -31,6 +32,7 @@ const FilmReszletek: React.FC = () => {
       }
 
       try {
+        // Film adatok lekérése cím alapján
         const data = await fetchFilmDetails(cim);
         setFilmDetails(data);
         const film = data[0][0];
@@ -42,8 +44,11 @@ const FilmReszletek: React.FC = () => {
         if (film.review_dates === null) {
           // Még nem kapott ez a film megtekintést, ezért adok neki
           const dateArray = [timestamp];
+
+          // Stringé alakítom át a tömböt es a tartalmát 
           const review_dates = `[${dateArray.map(item => String(item)).join(', ')}]`;
 
+          // Adat az API számára
           const Update_film_review = {
             "reviews": reviews,
             "review_dates": review_dates,
@@ -66,9 +71,14 @@ const FilmReszletek: React.FC = () => {
           // Ez a film már kapott megtekintést
           // A string array-t visszaállítom 
           const reviewdates = eval(film.review_dates) as number[];
+          
+          // A jelenlegi pontos időt is elmentem a többi közé
           reviewdates.push(timestamp);
+
+          // Stringé alakítom vissza a tömböt es a tartalmát 
           const review_dates = `[${reviewdates.map(item => String(item)).join(', ')}]`;
 
+          // Adat az API számára
           const Update_film_review = {
             "reviews": reviews,
             "review_dates": review_dates,
@@ -108,9 +118,11 @@ const FilmReszletek: React.FC = () => {
     );
   }
 
-  // Ha nincsenek adatok, akkor üzenet megjelenítése
+  // Ha nincsenek adatok, akkor közlöm
   if (!filmDetails) {
-    return <h1>Nincsenek adatok a filmről!</h1>;
+    <div className="flex items-center justify-center h-screen">
+      <h1 className="text-center">Nincsenek adatok a filmről!</h1>
+    </div>
   }
 
   // Film adatainak előkészítése

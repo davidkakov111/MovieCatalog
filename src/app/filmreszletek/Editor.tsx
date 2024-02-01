@@ -89,6 +89,7 @@ const EditorFilmReszletek: React.FC = () => {
         kepek4: kepekUrl4,
         kepek5: kepekUrl5,
       };
+
       // Backend felé történő adatküldés POST kérés segítségével
       const response = await fetch('/api/updateFilmRecord', {
         method: 'POST',
@@ -98,6 +99,7 @@ const EditorFilmReszletek: React.FC = () => {
         body: JSON.stringify(newData),
       });
 
+      // Ha sikerült frissíteni a filmet
       if (response.ok) {
         alert('A film sikeresen frissítve!');
       } else {

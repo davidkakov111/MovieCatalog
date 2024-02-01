@@ -92,6 +92,7 @@ export async function updateFilmRateing(NewFilmRateing: any): Promise<string> {
 export async function getFilmDetailsBycim(cim: string) {
   const connection = await pool.getConnection();
   try {
+    // Filmek lekérése
     const rows = await connection.query('SELECT * FROM filmek WHERE cim = ?', [cim]);
     if ([rows].length === 0) {
       return null;
@@ -226,7 +227,7 @@ export async function createFilmsTable() {
         kepek2 TEXT,
         kepek3 TEXT,
         kepek4 TEXT,
-        kepek5 TEXT,
+        kepek5 TEXT
       );
     `);
     return 'success';
