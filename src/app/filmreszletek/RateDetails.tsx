@@ -274,7 +274,31 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
     return (
         <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-300 rounded-md">
         <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
-        <img className="w-full h-auto" src={film_adatok.poszter_url} alt={film_adatok.cim} />
+        <div className="flex">
+          <div className="flex-1 w-60 overflow-hidden">
+            <div className="relative" style={{ paddingBottom: '100%' }}>
+              <div className="absolute inset-0">
+                <img src={film_adatok.poszter_url} className="w-full h-full object-cover aspect-content"/>
+              </div>
+            </div>
+          </div>
+          <div className="flex-1 w-60 overflow-hidden">
+            <div className="relative" style={{ paddingBottom: '100%' }}>
+              <div className="absolute inset-0">
+                <SlideShow
+                  images={[
+                    film_adatok.kepek1,
+                    film_adatok.kepek2,
+                    film_adatok.kepek3,
+                    film_adatok.kepek4,
+                    film_adatok.kepek5,
+                  ]}
+                  interval={1000}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
         <p className="text-gray-700 mt-4 mb-4">Megjelenés dátuma: {formattedDate}</p>
         <p className="text-gray-700">
             A film átlag értékelése: {Math.round(film_adatok.ertekeles)}/100 (Te már egyszer értékelted)
@@ -287,7 +311,31 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
     return (
         <div className="max-w-2xl mx-auto mt-8 p-4 bg-gray-300 rounded-md">
         <h2 className="text-3xl font-bold mb-4 text-center text-gray-800">{film_adatok.cim}</h2>
-        <img className="w-full h-auto" src={film_adatok.poszter_url} alt={film_adatok.cim} />
+        <div className="flex">
+          <div className="flex-1 w-60 overflow-hidden">
+            <div className="relative" style={{ paddingBottom: '100%' }}>
+              <div className="absolute inset-0">
+                <img src={film_adatok.poszter_url} className="w-full h-full object-cover aspect-content"/>
+              </div>
+            </div>
+          </div>
+          <div className="flex-1 w-60 overflow-hidden">
+            <div className="relative" style={{ paddingBottom: '100%' }}>
+              <div className="absolute inset-0">
+                <SlideShow
+                  images={[
+                    film_adatok.kepek1,
+                    film_adatok.kepek2,
+                    film_adatok.kepek3,
+                    film_adatok.kepek4,
+                    film_adatok.kepek5,
+                  ]}
+                  interval={1000}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
         <p className="text-gray-700 mt-4 mb-4">Megjelenés dátuma: {formattedDate}</p>
         <p className="text-gray-700">
           A film átlag értékelése: {Math.round(film_adatok.ertekeles)}/100
