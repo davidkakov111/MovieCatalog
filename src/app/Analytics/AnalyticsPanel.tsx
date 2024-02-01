@@ -160,7 +160,7 @@ const AnalyticsPanelForm: React.FC = () => {
             <br />
           </div>
           <div>
-            <br />
+            <br /> 
             <h2 style={{ textAlign: 'center' }}>Filmek népszerűsége</h2>
             <PieChart width={circlecontainerWidth} height={circlecontainerWidth}>
               <Pie
