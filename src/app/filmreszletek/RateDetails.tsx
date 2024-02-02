@@ -317,7 +317,7 @@ const RateFilmReszletek: React.FC<RateFilmReszletekProps> = ({ UserID }) => {
               film_adatok.kepek4,
               film_adatok.kepek5,
             ]}
-            interval={1000}
+            interval={3000}
           />
         </div>
       </div>
