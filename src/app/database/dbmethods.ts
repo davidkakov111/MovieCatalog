@@ -4,9 +4,9 @@ import mysql from 'mysql2/promise';
 // weboldal hostolva is megfelelően működhessen)
 const pool = mysql.createPool({
   host: 'sql11.freemysqlhosting.net',
-  user: 'sql11679887',
-  password: 'bhSQkesCHI',
-  database: 'sql11679887',
+  user: 'sql11681532',
+  password: 'nDNI2AFumH',
+  database: 'sql11681532',
   port: 3306,
   charset: 'utf8',
 });
@@ -221,9 +221,9 @@ export async function createFilmsTable() {
         rated_user_ids TEXT,
         kategoria ENUM('Akció', 'Vígjáték', 'Dráma', 'Horror', 'Sci-fi') NOT NULL,
         reviews INT DEFAULT 0,
-        kepek1 TEXT,
         rate_dates TEXT,
-        review_dates TEXT
+        review_dates TEXT,
+        kepek1 TEXT,
         kepek2 TEXT,
         kepek3 TEXT,
         kepek4 TEXT,
