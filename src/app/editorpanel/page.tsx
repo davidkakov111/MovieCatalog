@@ -1,23 +1,23 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
-import FilmForm from './FilmForm';
+import MovieForm from './MovieForm';
 
-// Ez a függvény az új film létrehozása oldalt definiálja
-export default async function FilmDetails() {
-  // Szerveroldali session lekérése
+// This function defines the page for creating a new movie
+export default async function MovieDetails() {
+  // Retrieve server-side session
   const session = await getServerSession();
 
-  // Ha nincs session, átirányítom a kezdőlapra a felhasználót
+  // If there is no session, redirect the user to the home page
   if (!session) {
     redirect("/");
   } else {
-    // Ha a felhasználó nem "Editor", átirányítom a kezdőlapra
+    // If the user is not an "Editor", redirect to the home page
     if (session.user?.image !== "Editor") {
       redirect("/");
     } else {
-      // Ha minden ellenőrzés sikeres, megjelenítem a FilmForm komponenst
+      // If all checks pass successfully, display the MovieForm component
       return (
-        <FilmForm />
+        <MovieForm />
       );
     }
   }

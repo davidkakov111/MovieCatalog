@@ -2,12 +2,12 @@
 import { signOut } from "next-auth/react";
 import Link from 'next/link';
 
-// A SignOut komponens
+// A SignOut component
 export default function SignOut() {
     return (
-        // Link komponens, ami egy kattintható hivatkozást generál
+        // Link component that generates a clickable reference
         <Link href="/#" onClick={() => {signOut();}}>
-            SignOut {/* Kijelentkezés szövege */}
+            SignOut {/* Text for sign out */}
         </Link>
     );
 }

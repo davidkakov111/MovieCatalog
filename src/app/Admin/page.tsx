@@ -1,23 +1,23 @@
-// Importálom az AdminPanel komponenst és a szükséges next/navigation, next-auth modulokat
+// Importing the AdminPanel component and necessary next/navigation, next-auth modules
 import AdminPanel from './AdminPanel';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 
-// Az AdminPage függvénnyel a bejelentkezett felhasználók ellenőrzését végezem
+// Using the AdminPage function to verify logged-in users
 export default async function AdminPage() {
-    // Session lekérés
+    // Session request
     const session = await getServerSession();
 
-    // Ellenőrizem, hogy a felhasználó be van-e jelentkezve
+    // Checking if the user is logged in
     if (!session) {
-        // Ha nincs bejelentkezett felhasználó, a kezdőoldalra irányítom
+        // If there is no logged-in user, redirect to the homepage
         redirect("/");
     } else {
-        // Ha a felhasználó be van jelentkezve, de nem admin, átirányítom a kezdőoldalra
+        // If the user is logged in but not an admin, redirect to the homepage
         if (session.user?.image !== "Admin") {
             redirect("/");
         } else {
-            // Ha a felhasználó admin, megjelenítem az AdminPanel komponenst
+            // If the user is an admin, display the AdminPanel component
             return (
                 <div>
                     <AdminPanel />

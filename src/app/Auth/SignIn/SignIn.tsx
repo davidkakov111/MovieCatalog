@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-// Sign-in form kompónens 
+// Sign-in form component
 const SignInForm = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -12,29 +12,29 @@ const SignInForm = () => {
   });
 
   const handleSignIn = async () => {
-    // Email tartalmaz-e @ karaktert ellenőrzése
+    // Checking if email contains @ character
     if (!formData.email.includes('@')) {
-      alert('Az email cím érvénytelen. Kérjük, adjon meg egy érvényes email címet.');
+      alert('Invalid email address. Please provide a valid email address.');
       return;
     }
 
-    // Mindkét mező kitöltöttségének ellenőrzése
+    // Checking both fields for completion
     if (!formData.email || !formData.password) {
-      alert('Mindkét mező kitöltése kötelező.');
+      alert('Both fields are mandatory.');
       return;
     }
 
-    // Sikeres ellenőrzés esetén folytatódhat a bejelentkezés
+    // If validation succeeds, proceed with sign-in
     const response = await signIn('credentials', { email: formData.email, password: formData.password, redirect: false });
     if(!response?.error) {
       router.push("/")
       router.refresh()
     } else {
-      alert("Helytelen bejelentkezési adatok")
+      alert("Incorrect login credentials")
     }
   };
 
-  // Állapot kezelő
+  // State handler
   const handleChange = (e: any) => {
     setFormData({
       ...formData,
@@ -45,11 +45,11 @@ const SignInForm = () => {
   return (
     <div className="flex items-start justify-center min-h-screen bg-gray-720">
       <div className="max-w-md mx-auto p-6 mt-14 bg-gray-200 rounded-md shadow-md self-start">
-        <h2 className="text-2xl text-gray-600 font-semibold mb-4">Bejelentkezés</h2>
+        <h2 className="text-2xl text-gray-600 font-semibold mb-4">Login</h2>
         <form>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-600">
-              Email cím
+              Email address
             </label>
             <input
               type="email"
@@ -62,7 +62,7 @@ const SignInForm = () => {
           </div>
           <div className="mb-4">
             <label htmlFor="password" className="block text-sm font-medium text-gray-600">
-              Jelszó
+              Password
             </label>
             <input
               type="password"
@@ -78,7 +78,7 @@ const SignInForm = () => {
             onClick={handleSignIn}
             className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
-            Bejelentkezés
+            Sign In
           </button>
         </form>
       </div>

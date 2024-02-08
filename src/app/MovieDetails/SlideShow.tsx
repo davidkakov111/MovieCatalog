@@ -1,24 +1,24 @@
-"use client"
+// Use client
 import React, { useEffect, useState } from 'react';
 
-// SlideShow komponens
+// SlideShow component
 const SlideShow: React.FC<{ images: string[]; interval: number }> = ({ images, interval }) => {
-  // Állapotváltozó inicializálása a jelenlegi kép indexel
+  // Initialize state variable for the current image index
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Effektus a komponens mount-jakor és a kép váltásához
+  // Effect for component mount and image transitions
   useEffect(() => {
-    // Időzítő inicializálása a kép váltásához
+    // Initialize timer for image transitions
     const intervalId = setInterval(() => {
-      // A jelenlegi kép indexének frissítése
+      // Update the current image index
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, interval);
 
-    // Tisztító függvény az időzítő leállításához a komponens elválasztásakor
+    // Cleanup function to stop the timer on component unmount
     return () => clearInterval(intervalId);
-  }, [images, interval]); // A dependency tömb tartalmazza a képek tömböt és az időközt
+  }, [images, interval]); // The dependency array includes the images array and the interval
 
-  // Kép megjelenítése a jelenlegi kép index alapján
+  // Display the image based on the current image index
   return <img className="w-full h-full object-cover" src={images[currentImageIndex]} />;
 };
 

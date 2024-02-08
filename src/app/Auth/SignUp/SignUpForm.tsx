@@ -3,36 +3,36 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-// Sign-up form kompónens
+// Sign-up form component
 const SignUpForm = () => {
-  // Router és állapot inicializálás
+  // Initializing router and state
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
 
-  // A regisztrációért felelős függvény
+  // Function responsible for registration
   const handleSignUp = async () => {
-    // Email ellenőrzése
+    // Checking email
     if (!formData.email.includes('@')) {
-      alert('Az email cím érvénytelen. Kérjük, adjon meg egy érvényes email címet.');
+      alert('The email address is invalid. Please provide a valid email address.');
       return;
     }
 
-    // Jelszó hosszúságának ellenőrzése
+    // Checking password length
     if (formData.password.length < 6) {
-      alert('A jelszó túl rövid. Legalább 6 karakter hosszúnak kell lennie.');
+      alert('The password is too short. It must be at least 6 characters long.');
       return;
     }
 
-    // Mindkét mező kitöltöttségének ellenőrzése
+    // Checking both fields are filled
     if (!formData.email || !formData.password) {
-      alert('Mindkét mező kitöltése kötelező.');
+      alert('Both fields are required to be filled.');
       return;
     }
 
-    // Az ellenőrzéseken sikeresen átmenve, elküldöm a regisztrációs kérést
+    // Passing the checks, sending registration request
     const databaseResponse = await fetch('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify({
@@ -41,26 +41,26 @@ const SignUpForm = () => {
       }),
     });
 
-    // Sikeres regisztráció esetén bejelentkeztetem a felhasználót
+    // Logging in the user upon successful registration
     if (databaseResponse.ok) {
       const response = await signIn('credentials', { email: formData.email, password: formData.password, redirect: false });
       if(!response?.error) {
           router.push("/")
           router.refresh()
       } else {
-          alert("A regisztrácio megtörtént, probálj meg bejelentkezni")
+          alert("Registration successful, please try logging in.")
       }
     } else {
       const jsres = await databaseResponse.json()
       if (jsres.message === 'SignIn') {
-        alert("Az email cím már foglalt") 
+        alert("The email address is already taken") 
       } else {
         alert(jsres.message)
       }
     };
   };
 
-  // Állapot kezelő
+  // State handler
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -71,11 +71,11 @@ const SignUpForm = () => {
   return (
     <div className="flex items-start justify-center min-h-screen bg-gray-720">
       <div className="max-w-md mx-auto p-6 mt-14 bg-gray-200 rounded-md shadow-md self-start">
-        <h2 className="text-2xl text-gray-600 font-semibold mb-4">Regisztráció</h2>
+        <h2 className="text-2xl text-gray-600 font-semibold mb-4">Registration</h2>
         <form>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-600">
-              Email cím
+              Email address
             </label>
             <input
               type="email"
@@ -88,7 +88,7 @@ const SignUpForm = () => {
           </div>
           <div className="mb-4">
             <label htmlFor="password" className="block text-sm font-medium text-gray-600">
-              Jelszó
+              Password
             </label>
             <input
               type="password"
@@ -104,7 +104,7 @@ const SignUpForm = () => {
             onClick={handleSignUp}
             className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
-            Regisztráció
+            Sign Up
           </button>
         </form>
       </div>

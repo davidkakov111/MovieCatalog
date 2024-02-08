@@ -1,19 +1,19 @@
-// Az importokat elvégezem a szükséges modulok beolvasásával
+// Perform imports with the necessary modules
 import SignUpForm from './SignUpForm';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 
-// A SignUpPage egy aszinkron függvény, amely bejelentkezési ellenőrzéseket hajt végre és megjeleníti a SignUpForm-ot
+// SignUpPage is an asynchronous function that performs login checks and displays the SignUpForm
 export default async function SignUpPage() {
-  // Session lekérése
+  // Fetch session
   const session = await getServerSession();
 
-  // Ellenőrizem, hogy a felhasználó már bejelentkezett-e, és ha igen, átirányítom a főoldalra
+  // Check if the user is already logged in and redirect to the homepage if so
   if (session) {
     redirect("/");
   }
 
-  // Ha a felhasználó nincs bejelentkezve, akkor megjelenítem a SignUpForm-ot
+  // If the user is not logged in, display the SignUpForm
   return (
     <div className="h-screen flex items-center justify-center bg-gray-720 py-16">
       <SignUpForm />

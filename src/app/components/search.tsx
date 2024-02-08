@@ -1,52 +1,49 @@
 "use client"
-import { RowDataPacket } from 'mysql2';
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
-// Az interface létrehozása a Search komponens props-aihoz
+// Creating the interface for the props of the Search component
 interface SearchProps {
-  placeholder: string; // A keresőmező helyére írandó szöveg
-  extracted: RowDataPacket[]; // A filmek adatainak tömbje, ami a keresőmezőben szűrésre kerül
+  placeholder: string; // Text to be displayed in the search field
+  extracted: any[]; // Array of movie data to be filtered in the search field
 }
 
-// A Search komponens definíciója
+// Definition of the Search component
 export default function Search({ placeholder, extracted }: SearchProps) {
 
-  // Dinamikus importálás, hogy lazy loadingal legyen megoldva a filmek feltöltése  
-  const FilmKomponens = dynamic(() => import('./filmkomponents'), { ssr: false }); 
+  // Dynamic import to lazy load the movies with lazy loading
+  const FilmComponent = dynamic(() => import('./MovieComponent'), { ssr: false });
 
-  // A keresőmezőbe beírt kifejezés
+  // The expression entered in the search field
   const [searchTerm, setSearchTerm] = useState<string>(''); 
-  // Szűrt filmek állapota
-  const [filteredMovies, setFilteredMovies] = useState<RowDataPacket[]>([]); 
+  // State of filtered movies
+  const [filteredMovies, setFilteredMovies] = useState<any[]>([]);
 
   useEffect(() => {
     handleSearch();
-  }, [searchTerm]); // Az useEffect csak akkor fut le, ha a searchTerm állapota változik
+  }, [searchTerm]); // The useEffect only runs when the searchTerm state changes
 
-  // A keresés kezelése
+  // Handling the search
   function handleSearch() {
     if (searchTerm.trim() === '') {
       setFilteredMovies([]);
       return;
     }
-
-    // A filmek szűrése a cím alapján
-    const filtered = extracted.filter((movie: RowDataPacket) => {
-      return movie.cim.toLowerCase().includes(searchTerm.toLowerCase());
+    // Filtering movies based on the title
+    const filtered = extracted.filter((movie) => {
+      return movie.title.toLowerCase().includes(searchTerm.toLowerCase());
     });
-
     setFilteredMovies(filtered);
   }
 
-  // A komponens megjelenítése
+  // Rendering the component
   return (
     <div className="text-center">
       <div className="relative flex flex-1 flex-shrink-0 mx-auto">
         <label htmlFor="search" className="sr-only">
-          Keresés
+          Search
         </label>
-        {/* A keresőmező input eleme */}
+        {/* Input element for the search field */}
         <input
           className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
           placeholder={placeholder}
@@ -54,10 +51,10 @@ export default function Search({ placeholder, extracted }: SearchProps) {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-      {/* Itt megjeleníthetőek vagy felhasználhatóak a szűrt filmek */}
+      {/* Filtered movies can be displayed or utilized here */}
       <div>
         {filteredMovies.map((movie, index) => (
-          <FilmKomponens key={index} title={movie.cim} />
+          <FilmComponent key={index} title={movie.title} />
         ))}
       </div>
     </div>

@@ -1,7 +1,7 @@
 import AnalyticsPanelForm from "./AnalyticsPanel";
 
-// Ez a függvény az Analytics oldal komponensét definiálja
-export default async function FilmDetails() {
+// This function defines the component for the Analytics page
+export default async function MovieDetails() {
   return (
     <AnalyticsPanelForm />
   );

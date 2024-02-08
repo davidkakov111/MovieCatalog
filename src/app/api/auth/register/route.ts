@@ -3,34 +3,31 @@ import { createUserRecord } from '../../../database/dbmethods';
 
 export async function POST(request: Request) {
   try {
-    // Felhasználói adatok kinyerése a kérés törzséből
-    const { email, password } = await request.json();
+    // Extract user data from the request body
+    const { email, password} = await request.json();
     
-    // Jelszó hashelése
+    // Hash the password
     const hashedPassword = await hash(password, 10);
     
-    // Felhasználói adatok összeállítása
-    const UserData = { "email": email, "password": hashedPassword };
+    // Create user record in the database
+    const result = await createUserRecord(email as string, hashedPassword);
     
-    // Felhasználói rekord létrehozása az adatbázisban
-    const result = await createUserRecord(UserData);
-    
-    // Sikeres regisztráció esetén
+    // In case of successful registration
     if (result === 'Success') {
-        return new Response(JSON.stringify({ success: true, message: result }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
+      return new Response(JSON.stringify({ success: true, message: result }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
     } else {
-        // Hiba esetén
-        return new Response(JSON.stringify({ success: false, message: result }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+      // In case of error
+      return new Response(JSON.stringify({ success: false, message: result }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+      });
     }
   } catch (e) {
-    // Szerverhiba esetén
-    return new Response(JSON.stringify({ success: false, message: 'Szerverhiba' }), {
+    // In case of server error
+    return new Response(JSON.stringify({ success: false, message: 'Server error!' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

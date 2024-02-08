@@ -3,49 +3,50 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from 'bcrypt';
 import { getUserDetailsByEmail } from "@/app/database/dbmethods";
 
-// NextAuth konfiguráció
+// Configuration for NextAuth
 const handler = NextAuth({
-    // JWT alapú session kezelés beállítása
+    // Setting up JWT-based session management
     session: {
         strategy: 'jwt'
     },
-    // Hitelesítő szolgáltatók konfigurációja
+    // Configuration for authentication providers
     providers: [CredentialsProvider({
         credentials: {
-            email: {}, // E-mail hitelesítési adatok
-            password: {} // Jelszó hitelesítési adatok
+            email: {}, // Email authentication data
+            password: {} // Password authentication data
         },
-        // Hitelesítési logika
-        async authorize(credentials: any, req: any) {
-            // Felhasználói adatok lekérése az e-mail cím alapján az adatbázisból
+        // Authentication logic
+        async authorize(credentials: { email: string; password: string } | undefined, req: any): Promise<any> {
+            if (credentials === undefined) {
+                return null
+            }
+            // Fetching user details based on email from the database
             const result = await getUserDetailsByEmail(credentials.email);
 
-            // Szerverhiba vagy regisztrációs hiba esetén visszatérés null értékkel
-            if (result === 'Szerverhiba' || result === 'SignUp') {
+            // Returning null in case of server error or sign-up issue
+            if (result === 'Server error' || result === 'SignUp') {
                 return null;
             }
 
-            // Felhasználó adatainak lekérése
+            // Fetching user data
             const user = result[0];
 
-            // Jelszó összehasonlítás a tárolt jelszóval
-            const passwordCorrect = await compare(credentials?.password, user.password);
-
-            // Ha a jelszó helyes, visszatérés a felhasználói adatokkal
+            // Comparing passwords with the stored one
+            const passwordCorrect = await compare(credentials.password, user.password);
+            // Returning user data if password is correct
             if (passwordCorrect) {
                 return {
-                    id: user.id,
                     name: user.id,
                     email: user.email,
                     image: user.type,
                 };
             }
 
-            // Helytelen jelszó esetén visszatérés null értékkel
+            // Returning null in case of incorrect password
             return null;
         }
-    })],
+    })]
 });
 
-// Az exportált handler az API végpontot kezeli
+// The exported handler manages the API endpoint
 export { handler as GET, handler as POST };

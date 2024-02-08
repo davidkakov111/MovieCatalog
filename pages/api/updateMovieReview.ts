@@ -1,18 +1,18 @@
 // Imported packages
 import { NextApiRequest, NextApiResponse } from 'next';
-import { updateUserTypeByEmail, update_user_type } from '../../src/app/database/dbmethods';
+import { updateMovieReviewByID, update_movie_review } from '../../src/app/database/dbmethods';
 
 // Api handler 
-export default async function updateUserTypeByEmailAPI(req: NextApiRequest, res: NextApiResponse) {
+export default async function updateMovieReview(req: NextApiRequest, res: NextApiResponse) {
     try {
         // Checking if the request type is POST
         if (req.method !== 'POST') {
-            // If not, sending back an error
+            // If not, then sending back an error
             return res.status(405).json({ message: 'Method Not Allowed!' });
         }
-        const user: update_user_type = req.body;
-        // Invoking updateUserTypeByEmail to update the type
-        const result = await updateUserTypeByEmail(user);
+        const Update_movie_review: update_movie_review = req.body;
+        // Invoking updateMovieReviewByID to update the movie review properties
+        const result = await updateMovieReviewByID(Update_movie_review)
         // Forwarding the response with appropriate status code
         if (result === 'Update successful') {
             return res.status(200).json({ result: result });

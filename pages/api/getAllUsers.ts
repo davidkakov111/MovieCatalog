@@ -1,36 +1,41 @@
-// Az importált csomagok
+// Imported packages
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAllUsers } from '../../src/app/database/dbmethods';
 
 // Api handler 
 export default async function getAllUsersAPI(req: NextApiRequest, res: NextApiResponse) {
     try {
-        // Ellenőrizem, hogy a kérés típusa GET-e
+        // Check if the request method is GET
         if (req.method !== 'GET') {
-            // Ha nem, akkor visszaküldök egy hibát
+            // If not, return a method not allowed error
             return res.status(405).json({ message: 'Method Not Allowed!' });
         }
         
-        // Meghívom a getAllUsers függvényt, ami a felhasználók adatait kéri le
-        const result: any = await getAllUsers();
-        
-        // Törölöm a jelszavakat az eredményből, mert azokat kockázatos lenne kiadni 
-        // a frontendnek még így is, hogy hashelve vannak
-        const usersWithoutPasswords = result.map((user: { password: any, [key: string]: any }) => {
+        // Call the getAllUsers function to retrieve user data
+        const result = await getAllUsers();
+ 
+        // If "Server error" return it
+        if (result === "Server error") {
+            return res.status(500).json({ result: result });
+        }
+
+        // Remove passwords from the result as it's risky to expose them to the frontend
+        // even though they are hashed 
+        const usersWithoutPasswords = result.map((user: { password: string, [key: string]: any }) => {
             const { password, ...userWithoutPassword } = user;
             return userWithoutPassword;
         });
 
-        // Ellenőrizem az eredményt és visszaküldöm a megfelelő választ
+        // Check the result and send the appropriate response
         if (usersWithoutPasswords) {
-            // Ha van eredmény, visszaküldöm a felhasználók adatait (jelszavak nélkül)
+            // If there is a result, send the user data (without passwords)
             return res.status(200).json({ result: usersWithoutPasswords });
         } else {
-            // Ha nincs eredmény, akkor belső szerverhiba üzenetet küldök vissza
+            // If there is no result, send an internal server error message
             return res.status(500).json({ result: "Internal server error!" });
         }
     } catch {
-        // Hibakezelés: Ha bármilyen hiba történik, akkor belső szerverhiba üzenetet küldök vissza
+        // Error handling: If any error occurs, send an internal server error message
         return res.status(500).json({ result: "Internal server error! (try/catch)" });
     }
 }

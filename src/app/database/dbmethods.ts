@@ -1,255 +1,286 @@
-import mysql from 'mysql2/promise';
+import { Pool } from 'pg';
 
-// MySQL adatbazis konfigurációja (Hosztolt adatbázis, hogy a 
-// weboldal hostolva is megfelelően működhessen)
-const pool = mysql.createPool({
-  host: 'sql11.freemysqlhosting.net',
-  user: 'sql11681532',
-  password: 'nDNI2AFumH',
-  database: 'sql11681532',
-  port: 3306,
-  charset: 'utf8',
+// Types
+export type updated_movie = {
+  id: number,
+  title: string,
+  description: string,
+  poster_url: string,
+  category: string,
+  image1: string,
+  image2: string,
+  image3: string,
+  image4: string,
+  image5: string,
+}
+export type update_movie_review = {
+  id: number
+  reviews: number,
+  review_dates: string
+}
+export type new_movie_rating = {
+  id: number,
+  movie_rating: number,
+  rated_user_ids: string,
+  rate_dates: string
+}
+export type movie_data = {
+  title: string,
+  description: string,
+  poster_url: string,
+  category: string,
+  image1: string,
+  image2: string,
+  image3: string,
+  image4: string,
+  image5: string,
+  relase_date: Date,
+}
+export type update_user_type = {
+  email: string,
+  newType: string
+}
+
+// Configuration for the PostgreSQL database
+const pool = new Pool({
+  user: process.env.POSTGRES_USER,
+  host: process.env.POSTGRES_HOST,
+  database: process.env.POSTGRES_DATABASE,
+  password: process.env.POSTGRES_PASSWORD,
+  port: 5432,
+  ssl: true
 });
 
-// Felhasználó típusának frissítése az "users" táblában email alapján
-export async function updateUserTypeByEmail(email: string, newType: string): Promise<string> {
-  const connection = await pool.getConnection();
+// Update the user type in the "users" table based on email
+export async function updateUserTypeByEmail(user: update_user_type): Promise<string> {
+  const client = await pool.connect();
   try {
-    // Ellenőrizem, hogy a felhasználó létezik-e az adatbázisban
-    const userExistsResult = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
-
-    const userExists = [userExistsResult].length > 0;
-
-    if (!userExists) {
-      return 'Felhasználó nem található';
-    }
-
-    // Frissítem a felhasználó típusát
-    await connection.query('UPDATE users SET type = ? WHERE email = ?', [newType, email]);
-
-    return 'Sikeres frissítés';
+    // Update the user type
+    await client.query('UPDATE users SET type = $1 WHERE email = $2', [user.newType, user.email]);
+    return 'Update successful';
   } catch (error) {
-    console.error('Hiba a frissítés közben:', error);
-    // Szerverhiba esetén egy szöveget adok vissza
-    return 'Szerverhiba';
+    console.error('Error during update:', error);
+    // Return a text in case of server error
+    return 'Server error';
   } finally {
-    await connection.release();
+    client.release();
   }
 }
 
-// Film frissítése id alapján
-export async function updateFilmByID(Updated_film: any): Promise<string> {
-  const connection = await pool.getConnection();
+// Update movie by ID
+export async function updateMovieByID(Updated_movie: updated_movie): Promise<string> {
+  const client = await pool.connect();
   try {
-    // Frissíem a filmet
-    await connection.query('UPDATE filmek SET cim = ?, leiras = ?, poszter_url = ?, kategoria = ?, kepek1 = ?, kepek2 = ?, kepek3 = ?, kepek4 = ?, kepek5 = ? WHERE id = ?', 
-      [Updated_film.cim, Updated_film.leiras, Updated_film.poszter_url, Updated_film.kategoria, Updated_film.kepek1, Updated_film.kepek2, Updated_film.kepek3, Updated_film.kepek4, Updated_film.kepek5, Updated_film.id]);
-    return 'Sikeres frissítés';
+    // Update the movie
+    await client.query('UPDATE movies SET title = $1, description = $2, poster_url = $3, category = $4, image1 = $5, image2 = $6, image3 = $7, image4 = $8, image5 = $9 WHERE id = $10',
+      [Updated_movie.title, Updated_movie.description, Updated_movie.poster_url, Updated_movie.category, Updated_movie.image1, Updated_movie.image2, Updated_movie.image3, Updated_movie.image4, Updated_movie.image5, Updated_movie.id]);
+    return 'Update successful';
   } catch (error) {
-    console.error('Hiba a frissítés közben:', error);
-    // Szerverhiba esetén egy szöveget adok vissza
-    return 'Szerverhiba';
+    console.error('Error during update:', error);
+    // Return a text in case of server error
+    return 'Server error';
   } finally {
-    await connection.release();
+    client.release();
   }
 }
 
-// Film review frissítése id alapján
-export async function updateFilmReviewByID(Update_film_review: any): Promise<string> {
-  const connection = await pool.getConnection();
+// Update movie review by ID
+export async function updateMovieReviewByID(Update_movie_review: update_movie_review): Promise<string> {
+  const client = await pool.connect();
   try {
-    // Frissíem a film review-jét
-    await connection.query('UPDATE filmek SET reviews = ?, review_dates = ? WHERE id = ?', 
-      [Update_film_review.reviews, Update_film_review.review_dates, Update_film_review.id]);
-    return 'Sikeres frissítés';
+    // Update the movie review
+    await client.query('UPDATE movies SET reviews = $1, review_dates = $2 WHERE id = $3',
+      [Update_movie_review.reviews, Update_movie_review.review_dates, Update_movie_review.id]);
+    return 'Update successful';
   } catch (error) {
-    console.error('Hiba a frissítés közben:', error);
-    // Szerverhiba esetén egy szöveget adok vissza
-    return 'Szerverhiba';
+    console.error('Error during update:', error);
+    // Return a text in case of server error
+    return 'Server error';
   } finally {
-    await connection.release();
+    client.release();
   }
 }
 
-// Film értékelésének frissítése
-export async function updateFilmRateing(NewFilmRateing: any): Promise<string> {
-  const connection = await pool.getConnection();
+// Update movie rating
+export async function updateMovieRating(NewMovieRating: new_movie_rating): Promise<string> {
+  const client = await pool.connect();
   try {
-    // Frissíem az értékelést
-    await connection.query('UPDATE filmek SET ertekeles = ?, rated_user_ids = ?, rate_dates = ? WHERE id = ?', 
-      [NewFilmRateing.film_ertekeles, NewFilmRateing.film_rated_user_ids, NewFilmRateing.rate_dates, NewFilmRateing.film_id]);
-    return 'Sikeres frissítés';
+    // Update the rating
+    await client.query('UPDATE movies SET rating = $1, rated_user_ids = $2, rate_dates = $3 WHERE id = $4',
+      [NewMovieRating.movie_rating, NewMovieRating.rated_user_ids, NewMovieRating.rate_dates, NewMovieRating.id]);
+    return 'Update successful';
   } catch (error) {
-    console.error('Hiba a frissítés közben:', error);
-    // Szerverhiba esetén egy szöveget adok vissza
-    return 'Szerverhiba';
+    console.error('Error during update:', error);
+    // Return a text in case of server error
+    return 'Server error';
   } finally {
-    await connection.release();
+    client.release();
   }
 }
 
-// Film adatok lekérdezése cim alapján a "filmek" táblából
-export async function getFilmDetailsBycim(cim: string) {
-  const connection = await pool.getConnection();
+// Retrieve movie details by title from the "movies" table
+export async function getMovieDetailsByTitle(title: string) {
+  const client = await pool.connect();
   try {
-    // Filmek lekérése
-    const rows = await connection.query('SELECT * FROM filmek WHERE cim = ?', [cim]);
-    if ([rows].length === 0) {
-      return null;
+    // Retrieve the movie (Titles are unique)
+    const { rows } = await client.query('SELECT * FROM movies WHERE title = $1', [title]);
+    if (rows.length === 0) {
+      return "Movie details are not available";
     }
     return rows;
   } catch (error) {
-    console.error('Hiba a lekerdezes kozben:', error);
-    return null;
+    console.error('Error during query:', error);
+    // Return a text in case of server error
+    return 'Server error';
   } finally {
-    await connection.release();
+    client.release();
   }
 }
 
-// Felhasználó adatainak lekérdezése email alapján a "users" táblából
-export async function getUserDetailsByEmail(email: string): Promise<any> {
-  const connection = await pool.getConnection();
+// Retrieve user details by email from the "users" table
+export async function getUserDetailsByEmail(email: string) {
+  const client = await pool.connect();
   try {
-    const result = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
-    const extracted_result:any = result[0]
-    if (extracted_result.length === 0) {
+    // Retrieve the user (Emails are unique)
+    const { rows } = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (rows.length === 0) {
       return 'SignUp';
     }
-    return extracted_result;
-  } catch (error) {
-    console.error('Hiba a lekérdezés közben:', error);
-    // Szerverhiba esetén egy szöveget adok vissza
-    return 'Szerverhiba';
-  } finally {
-    await connection.release();
-  }
-}
-
-// Film rekord lekérdezése ID alapján a "filmek" táblából
-export async function getFilmById(id: number) {
-  const connection = await pool.getConnection();
-  try {
-    const rows = await connection.query('SELECT * FROM filmek WHERE id = ?', [id]);
-    if ([rows].length === 0) {
-      return null;
-    }
     return rows;
   } catch (error) {
-    console.error('Hiba a lekerdezes kozben:', error);
-    return null;
+    console.error('Error during query:', error);
+    // Return a text in case of server error
+    return 'Server error';
   } finally {
-    await connection.release();
+    client.release();
   }
 }
 
-// Összes felhasználó lekérése
+// Retrieve all users
 export async function getAllUsers() {
-  const connection = await pool.getConnection();
+  const client = await pool.connect();
   try {
-    const results = await connection.query('SELECT * FROM users');
-    return results[0];
+    const { rows } = await client.query('SELECT * FROM users');
+    return rows;
+  } catch (error) {
+    console.error('Error during query:', error);
+    // Return a text in case of server error
+    return 'Server error';
   } finally {
-    connection.release();
+    client.release();
   }
 }
 
-// Összes film lekérése
-export async function getAllFilm() {
-  const connection = await pool.getConnection();
+// Retrieve all movies
+export async function getAllMovies() {
+  const client = await pool.connect();
   try {
-    const results = await connection.query('SELECT * FROM filmek');
-    return results[0];
+    const { rows } = await client.query('SELECT * FROM movies');
+    return rows;
+  } catch (error) {
+    console.error('Error during query:', error)
+    // Return a text in case of server error
+    return "Server error";
   } finally {
-    connection.release();
+    client.release();
   }
 }
 
-// Film létrehozása
-export async function createFilmRecord(movieData: any): Promise<string> {
-  const connection = await pool.getConnection();
+// Create movie record
+export async function createMovieRecord(movieData: movie_data): Promise<string> {
+  const client = await pool.connect();
   try {
-    // SQL insert parancs létrehozása és végrehajtása az értékekkel
-    const sql = 'INSERT INTO filmek (cim, leiras, megjelenes_datuma, poszter_url, kategoria, kepek1, kepek2, kepek3, kepek4, kepek5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    const values = [movieData.cim, movieData.leiras, movieData.megjelenes_datuma, movieData.poszter_url, movieData.kategoria, movieData.kepek1, movieData.kepek2, movieData.kepek3, movieData.kepek4, movieData.kepek5];
-    await connection.execute(sql, values);
-    return 'Rekord sikeresen letrehozva!';
-  } catch (error:any) {
-    if (error.code === 'ER_DUP_ENTRY') {
-      return 'Meglevo film';
+    // Create and execute SQL insert command with values
+    const sql = 'INSERT INTO movies (title, description, release_date, poster_url, category, image1, image2, image3, image4, image5) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)';
+    const values = [movieData.title, movieData.description, movieData.relase_date, movieData.poster_url, movieData.category, movieData.image1, movieData.image2, movieData.image3, movieData.image4, movieData.image5];
+    await client.query(sql, values);
+    return 'Record successfully created!';
+  } catch (error: any) {
+    if (error.code === "23505") {
+      return 'Existing film';
     } else {
-      console.error('Hiba a rekord letrehozasa kozben:', error, "Hiba vege!");
-      throw new Error('Hiba a rekord letrehozasa kozben');
+      console.error('Error during record creation:', error);
+      // Return a text in case of server error
+      return 'Server error';
     }
   } finally {
-      await connection.release();
+    client.release();
   }
 }
 
-// User regisztrálása
-export async function createUserRecord(UserData: any): Promise<string> {
-  const connection = await pool.getConnection();
+// Register user
+export async function createUserRecord(email: string, password: string): Promise<string> {
+  const client = await pool.connect();
   try {
-    // SQL insert parancs létrehozása és végrehajtása az értékekkel
-    const sql = 'INSERT INTO users (email, password, type) VALUES (?, ?, ?)';
-    const values = [UserData.email, UserData.password, 'Viewer'];
-    await connection.execute(sql, values);
+    // Create and execute SQL insert command with values
+    const sql = 'INSERT INTO users (email, password, type) VALUES ($1, $2, $3)';
+    const values = [email, password, 'Viewer'];
+    await client.query(sql, values);
     return 'Success';
-  } catch (error:any) {
-    // Ellenőrizem, hogy az e-mail cím már létezik-e
-    if (error.code === 'ER_DUP_ENTRY') {
+  } catch (error: any) {
+    // Check if the email already exists 
+    if (error.code === "23505") {
       return 'SignIn';
     } else {
-      throw new Error('Hiba a rekord letrehozasa kozben');
+      console.error('Error during record creation:', error);
+      // Return a text in case of server error
+      return 'Server error';
     }
   } finally {
-    await connection.release();
+    client.release();
   }
 }
 
-// Adatbázis tábla létrehozása a filmekhez
-export async function createFilmsTable() {
-  const connection = await pool.getConnection();
+// Create a database table for movies
+export async function createMoviesTable() {
+  const client = await pool.connect();
   try {
-    await connection.query(`
-      CREATE TABLE IF NOT EXISTS filmek (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        cim VARCHAR(255) NOT NULL UNIQUE,
-        leiras TEXT NOT NULL,
-        megjelenes_datuma DATE NOT NULL,
-        poszter_url VARCHAR(255) NOT NULL,
-        ertekeles FLOAT DEFAULT 0,
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS movies (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL UNIQUE,
+        description TEXT NOT NULL,
+        release_date DATE NOT NULL,
+        poster_url TEXT NOT NULL,
+        rating FLOAT DEFAULT 0,
         rated_user_ids TEXT,
-        kategoria ENUM('Akció', 'Vígjáték', 'Dráma', 'Horror', 'Sci-fi') NOT NULL,
+        category VARCHAR(255) NOT NULL,
         reviews INT DEFAULT 0,
         rate_dates TEXT,
         review_dates TEXT,
-        kepek1 TEXT,
-        kepek2 TEXT,
-        kepek3 TEXT,
-        kepek4 TEXT,
-        kepek5 TEXT
+        image1 TEXT,
+        image2 TEXT,
+        image3 TEXT,
+        image4 TEXT,
+        image5 TEXT
       );
     `);
     return 'success';
+  } catch (error) {
+    console.error('Error during table creation:', error);
+    return 'Server error';
   } finally {
-    connection.release();
+    client.release();
   }
 }
 
-// Adatbázis tábla létrehozása a felhasználóknak
+// Create a database table for users
 export async function createUsersTable() {
-  const connection = await pool.getConnection();
+  const client = await pool.connect();
   try {
-    await connection.query(`
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        type ENUM('Viewer', 'Editor', 'Admin') NOT NULL
+        type VARCHAR(255) NOT NULL
       )
     `);
     return 'success';
+  } catch (error) {
+    console.error('Error during table creation:', error);
+    return 'Server error';
   } finally {
-    connection.release();
+    client.release();
   }
 }
