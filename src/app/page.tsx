@@ -110,57 +110,57 @@ const Home: React.FC = () => {
   // If there is data, display the search bar and movie components
   return (
     <div>
-      <div className="mt-4 flex items-center justify-center gap-2 md:mt-8">
-        <Search placeholder="Search for movies" extracted={MovieData} />
+      <div className="mt-4 flex items-center justify-center gap-2 md:mt-8    flex-col">
+        <Search placeholder="🔎︎ Search for movies" extracted={MovieData} />
       </div>
       <br />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="bg-black bg-opacity-15 rounded-lg p-4">
+        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
           {/* Adding a title */}
-          <h2 className="text-2xl font-semibold mb-4 text-center">Hot</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-center text-yellow-500">Recently Trending</h2>
           {/* Displaying movies using the MovieComponent */}
           {HotTopicMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} />
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
           ))}
         </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4">
+        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
           {/* Adding a title */}
           <h2 className="text-2xl font-semibold mb-4 text-center">Action</h2>
           {/* Displaying movies using the MovieComponent */}
           {ActionMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} />
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
           ))}
         </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4">
+        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
           {/* Adding a title */}
           <h2 className="text-2xl font-semibold mb-4 text-center">Comedy</h2>
           {/* Displaying movies using the MovieComponent */}
           {ComedyMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} />
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
           ))}
         </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4">
+        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
           {/* Adding a title */}
           <h2 className="text-2xl font-semibold mb-4 text-center">Drama</h2>
           {/* Displaying movies using the MovieComponent */}
           {DramaMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} />
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
           ))}
         </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4">
+        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
           {/* Adding a title */}
           <h2 className="text-2xl font-semibold mb-4 text-center">Horror</h2>
           {/* Displaying movies using the MovieComponent */}
           {HorrorMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} />
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
           ))}
         </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4">
+        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
           {/* Adding a title */}
           <h2 className="text-2xl font-semibold mb-4 text-center">Sci-fi</h2>
           {/* Displaying movies using the MovieComponent */}
           {ScifiMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} />
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
           ))}
         </div>
       </div>
