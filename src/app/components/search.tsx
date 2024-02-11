@@ -54,7 +54,7 @@ export default function Search({ placeholder, extracted }: SearchProps) {
       {/* Filtered movies can be displayed or utilized here */}
       <div>
         {filteredMovies.map((movie, index) => (
-          <FilmComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
+          <FilmComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating}/>
         ))}
       </div>
     </div>
