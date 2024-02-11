@@ -55,21 +55,15 @@ const Home: React.FC = () => {
           const weekDeadline = timestamp - 604800;
 
           // Hotfilms includes the number of views of movies last week, to which 
-          // I add the number of reviews of last week multiplied by 5, getting a 
+          // I add the number of ratings of last week multiplied by 5, getting a 
           // realistic picture of movies that have attracted users' attention the most
           const HotMovies = extracted.map((movie) => {
             const reviewDatesCount = movie.review_dates
-              ? movie.review_dates
-                  .replace("[", "")
-                  .replace("]", "")
-                  .split(", ")
+              ? JSON.parse(movie.review_dates)
                   .filter((date: string) => parseInt(date, 10) > weekDeadline).length
               : 0;
             const rateDatesCount = movie.rate_dates
-              ? movie.rate_dates
-                  .replace("[", "")
-                  .replace("]", "")
-                  .split(", ")
+              ? JSON.parse(movie.rate_dates)
                   .filter((date: string) => parseInt(date, 10) > weekDeadline).length
               : 0;
             return {
@@ -80,7 +74,7 @@ const Home: React.FC = () => {
 
           // Movies based on popularity index, in descending order
           HotMovies.sort((a, b) => b.HotTopicIndex - a.HotTopicIndex);
-          
+      
           // Selecting the top 5 movies based on popularity index
           const top5Movies = HotMovies.slice(0, 5).map((item) => item.movie);
           setHotTopicMovieData(top5Movies)
@@ -120,7 +114,7 @@ const Home: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-center text-yellow-500">Recently Trending</h2>
           {/* Displaying movies using the MovieComponent */}
           {HotTopicMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating}/>
           ))}
         </div>
         <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
@@ -128,7 +122,7 @@ const Home: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-center">Action</h2>
           {/* Displaying movies using the MovieComponent */}
           {ActionMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating}/>
           ))}
         </div>
         <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
@@ -136,7 +130,7 @@ const Home: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-center">Comedy</h2>
           {/* Displaying movies using the MovieComponent */}
           {ComedyMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating}/>
           ))}
         </div>
         <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
@@ -144,7 +138,7 @@ const Home: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-center">Drama</h2>
           {/* Displaying movies using the MovieComponent */}
           {DramaMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating}/>
           ))}
         </div>
         <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
@@ -152,7 +146,7 @@ const Home: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-center">Horror</h2>
           {/* Displaying movies using the MovieComponent */}
           {HorrorMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating}/>
           ))}
         </div>
         <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center">
@@ -160,7 +154,7 @@ const Home: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-center">Sci-fi</h2>
           {/* Displaying movies using the MovieComponent */}
           {ScifiMovieData.map((movie, index) => (
-            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url}/>
+            <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating}/>
           ))}
         </div>
       </div>
