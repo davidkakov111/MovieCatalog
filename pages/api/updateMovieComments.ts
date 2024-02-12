@@ -1,18 +1,18 @@
 // Imported packages
 import { NextApiRequest, NextApiResponse } from 'next';
-import { updateMovieRating, new_movie_rating } from '../../src/app/database/dbmethods';
+import { updateMovieComments, new_movie_comments } from '../../src/app/database/dbmethods';
 
 // Api handler
-export default async function updateMovieRate(req: NextApiRequest, res: NextApiResponse) {
+export default async function updateMovieComment(req: NextApiRequest, res: NextApiResponse) {
     try {
         // Checking if the request type is POST
         if (req.method !== 'POST') {
             // If not, sending back an error
             return res.status(405).json({ message: 'Method Not Allowed!' });
         }
-        const NewMovieRateing: new_movie_rating = req.body;
-        // Calling the updateMovieRating function to update the movie rating
-        const result = await updateMovieRating(NewMovieRateing);
+        const NewMovieComment: new_movie_comments = req.body;
+        // Calling the updateMovieComments function to update the movie rating
+        const result = await updateMovieComments(NewMovieComment);
         // Forwarding the response with appropriate status code
         if (result === 'Update successful') {
             return res.status(200).json({ result: result });

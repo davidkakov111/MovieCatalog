@@ -136,7 +136,7 @@ const AnalyticsPanelForm: React.FC = () => {
       <div id="ChartContainer">
         {/* Bar chart for films */}
         <div>
-          <h2 style={{ textAlign: 'center' }}>Popularity of Films Since Release</h2>
+          <h2 style={{ textAlign: 'center' }}>Popularity of Movies Since Release</h2>
           <BarChart width={barcontainerWidth} height={barcontainerWidth / 2.5} data={MovieData}>
             <XAxis dataKey="title" />
             <YAxis />
@@ -182,7 +182,7 @@ const AnalyticsPanelForm: React.FC = () => {
           </div>
           <div>
             <br /> 
-            <h2 style={{ textAlign: 'center' }}>Popularity of Films</h2>
+            <h2 style={{ textAlign: 'center' }}>Popularity of Movies</h2>
             <PieChart width={circlecontainerWidth} height={circlecontainerWidth}>
               <Pie
                 data={MovieData}

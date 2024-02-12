@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react';
 import SlideShow from './SlideShow';
 import { update_movie_review } from '../database/dbmethods';
 import ReactStarRatings from 'react-star-ratings';
+import CommentComponent from '../components/CommentComponent';
 
 // Movie details component
 const MovieDetails: React.FC = () => {
   const [MovieDetails, setMovieDetails] = useState<any>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [OriginalComments, setOriginalComments] = useState<[]>([]);
 
   // Function to fetch movie details and update review
   const fetchAndUpdateMovieDetails = async (title: string) => {
@@ -25,6 +27,7 @@ const MovieDetails: React.FC = () => {
 
       // Set movie details
       setMovieDetails(movie);
+      setOriginalComments(JSON.parse(movie.comments || '[]'))
 
       // Increment the number of reviews
       const reviews: number = (movie.reviews || 0) + 1;
@@ -124,6 +127,18 @@ const MovieDetails: React.FC = () => {
       </div>
       {/* Display movie description */}
       <p className="text-gray-700 mt-5">{MovieDetails.description}</p>
+      {/* Display the comment section */}
+      <div className="bg-gray-200 p-6 rounded-lg shadow-md mt-5">
+        <h2 className="text-black text-center text-2xl font-bold">Comment Section</h2>
+        <p className="text-black text-center text-small mb-4">(Sign in to comment)</p>
+        {OriginalComments.length > 0 ? (
+          OriginalComments.map((comment, index) => (
+            <CommentComponent key={index} comment={comment} />
+          ))
+        ) : (
+          <p className="text-black text-center">Nothing to see here. Add a comment!</p>
+        )}
+      </div>
     </div>
   );
 };

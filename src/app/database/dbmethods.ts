@@ -24,6 +24,10 @@ export type new_movie_rating = {
   rated_user_ids: string,
   rate_dates: string
 }
+export type new_movie_comments = {
+  id: number,
+  comments: string
+}
 export type movie_data = {
   title: string,
   description: string,
@@ -108,6 +112,23 @@ export async function updateMovieRating(NewMovieRating: new_movie_rating): Promi
     // Update the rating
     await client.query('UPDATE movies SET rating = $1, rated_user_ids = $2, rate_dates = $3 WHERE id = $4',
       [NewMovieRating.movie_rating, NewMovieRating.rated_user_ids, NewMovieRating.rate_dates, NewMovieRating.id]);
+    return 'Update successful';
+  } catch (error) {
+    console.error('Error during update:', error);
+    // Return a text in case of server error
+    return 'Server error';
+  } finally {
+    client.release();
+  }
+}
+
+// Update movie comments
+export async function updateMovieComments(NewMovieComment: new_movie_comments): Promise<string> {
+  const client = await pool.connect();
+  try {
+    // Update the comments
+    await client.query('UPDATE movies SET comments = $1 WHERE id = $2',
+      [NewMovieComment.comments, NewMovieComment.id]);
     return 'Update successful';
   } catch (error) {
     console.error('Error during update:', error);
@@ -252,7 +273,8 @@ export async function createMoviesTable() {
         image2 TEXT,
         image3 TEXT,
         image4 TEXT,
-        image5 TEXT
+        image5 TEXT,
+        comments TEXT
       );
     `);
     return 'success';
