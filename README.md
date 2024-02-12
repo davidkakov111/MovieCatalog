@@ -1,27 +1,27 @@
 [Movie Catalog Web Application 🎬](https://mymoviecatalog.vercel.app/)
 ---------------------------------------------------------------------------------------------
 
-I developed a movie catalog website using mainly Next.js and TypeScript, where users can easily browse, rate, create, and manage movies. Below, I outline the functionalities that have been implemented, including administration features:
+I developed a movie catalog website using mainly Next.js and TypeScript, where users can easily browse, rate, comment, create, and manage movies. Below, I outline the functionalities that have been implemented, including administration features:
 
 Homepage: 🏠
 The homepage displays a list of movies, with lazy loading implemented for efficient loading.
 Users can easily search for movies using the search bar.
 
 Movie Details Page: 🎥
-Users can click on a movie to access detailed information, including images, description, release date, associated ratings, etc.
+Users can click on a movie to access detailed information, including images, description, release date, associated ratings and comments, etc.
 
 Movie Data: ℹ️
-Each movie includes the following data: title, poster, images, release date, ratings, and description.
+Each movie includes the following data: title, poster, images, release date, ratings, description and comments.
 
 User Accounts: 👥
 Users have the option to log in or register, and their credentials are encrypted in the database.
-After logging in, they can add ratings to various movies or create and modify movies if they have the Editor role granted by an Admin.
+After logging in, they can add ratings and comments to various movies or create and modify movies if they have the Editor role granted by an Admin.
 
 Admin Panel: 🛠️
 Administrators have access to an administrative interface where they can easily view the list of users and modify their roles, such as granting or revoking Viewer/Editor/Admin privileges.
 
 User Roles: 🎭
-Viewer: Can add ratings to movies.
+Viewer: Can add ratings and comments to movies.
 Editor: Can create and modify movies.
 Admin: Can manage users, including modifying their roles.
 
