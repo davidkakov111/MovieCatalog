@@ -238,7 +238,7 @@ const RateMovie: React.FC<any> = ( UserID ) => {
           type="text"
           placeholder="Write a comment..."
           onChange={handleComment}
-          className="w-80 md:w-96 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+          className="w-25 md:w-25 px-2 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
         />
         <button
           className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
