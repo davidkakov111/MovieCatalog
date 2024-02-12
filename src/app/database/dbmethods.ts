@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 
-// Types
+// Types 
 export type updated_movie = {
   id: number,
   title: string,
