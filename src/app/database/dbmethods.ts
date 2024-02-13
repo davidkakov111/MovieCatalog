@@ -158,6 +158,46 @@ export async function getMovieDetailsByTitle(title: string) {
   }
 }
 
+// Retrieve the recently trending movies from the "movies" table
+export async function getTrendingMovieDetails() {
+  const client = await pool.connect();
+  try {
+    // Retrieve the recently trending movie details 
+    const rows = await client.query('SELECT title, poster_url, rating, (reviews + 5 * COUNT(rate_dates_element)) AS popularity_index FROM movies LEFT JOIN LATERAL json_array_elements_text(rate_dates::json) AS rate_dates_element ON true GROUP BY title, poster_url, rating, reviews ORDER BY popularity_index DESC LIMIT 5;');
+    const result = rows.rows
+    if (result.length === 0) {
+      return "Movie details are not available";
+    }
+    return result;
+  } catch (error) {
+    console.error('Error during query:', error);
+    // Return a text in case of server error
+    return 'Server error';
+  } finally {
+    client.release();
+  }
+}
+
+// Retrieve movies by category from the "movies" table
+export async function getMovieDetailsByCategory(category: string) {
+  const client = await pool.connect();
+  try {
+    // Retrieve the movies by category
+    const rows = await client.query('SELECT title, poster_url, rating FROM movies WHERE category = $1', [category]);
+    const result = rows.rows
+    if (result.length === 0) {
+      return "Movie details are not available";
+    }
+    return result;
+  } catch (error) {
+    console.error('Error during query:', error);
+    // Return a text in case of server error
+    return 'Server error';
+  } finally {
+    client.release();
+  }
+}
+
 // Retrieve user details by email from the "users" table
 export async function getUserDetailsByEmail(email: string) {
   const client = await pool.connect();
@@ -196,8 +236,12 @@ export async function getAllUsers() {
 export async function getAllMovies() {
   const client = await pool.connect();
   try {
-    const { rows } = await client.query('SELECT * FROM movies');
-    return rows;
+    const rows = await client.query('SELECT title, poster_url, rating FROM movies');
+    const result = rows.rows
+    if (result.length === 0) {
+      return "Movie details are not available";
+    }
+    return result;
   } catch (error) {
     console.error('Error during query:', error)
     // Return a text in case of server error
