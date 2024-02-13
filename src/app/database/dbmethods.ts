@@ -232,11 +232,30 @@ export async function getAllUsers() {
   }
 }
 
+// Retrieve all movies main parts
+export async function getAllMoviesMainParts() {
+  const client = await pool.connect();
+  try {
+    const rows = await client.query('SELECT title, poster_url, rating FROM movies');
+    const result = rows.rows
+    if (result.length === 0) {
+      return "Movie details are not available";
+    }
+    return result;
+  } catch (error) {
+    console.error('Error during query:', error)
+    // Return a text in case of server error
+    return "Server error";
+  } finally {
+    client.release();
+  }
+}
+
 // Retrieve all movies
 export async function getAllMovies() {
   const client = await pool.connect();
   try {
-    const rows = await client.query('SELECT title, poster_url, rating FROM movies');
+    const rows = await client.query('SELECT * FROM movies');
     const result = rows.rows
     if (result.length === 0) {
       return "Movie details are not available";

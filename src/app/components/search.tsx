@@ -17,7 +17,7 @@ export default function Search() {
     const fetchData = async () => {
       try {
         // Sending a fetch request to the API
-        const response = await fetch('/api/getAllMovie', {
+        const response = await fetch('/api/getAllMoviesMainParts', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
