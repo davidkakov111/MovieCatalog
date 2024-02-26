@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Search from './components/search';
 import MovieComponent from './components/MovieComponent';
+import { fetchMoviesByCategory } from './components/CategoryComponent';
 
 const Home: React.FC = () => {
   // Initializing state to store movie data
@@ -87,33 +88,16 @@ const Home: React.FC = () => {
     });
   };
 
+  // Function to fetch movies by category
   const fetchMovies = async (category: string) => {
-    try {
-      // Send a POST request to the backend API for movies by category (~ lazy loading)
-      const response = await fetch('/api/MovieDetailsByCategory', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(category),
-      });
-    
-      // Check if the request was successful
-      if (response.ok) {
-        // Parsing the JSON response
-        const jsres = await response.json();
-        const extracted = jsres.result as any[];
-        setMoviesByCategory(prevState => ({
-          ...prevState,
-          [category]: extracted,
-        }));
-      } else {
-        const jsres = await response.json();
-        const extracted: string = jsres.result;
-        alert(extracted); // Alert the user if an error occurs
-      }
-    } catch (error) {
-      console.error(`Error fetching ${category} movies:`, error);
+    const result = await fetchMoviesByCategory(category)
+    if (typeof result === 'string') {
+      console.error(result)
+    } else {
+      setMoviesByCategory(prevState => ({
+        ...prevState,
+        [category]: result,
+      }));
     }
   };
 
