@@ -1,16 +1,19 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import SlideShow from './SlideShow';
-import { new_movie_rating, new_movie_comments, update_movie_review  } from '../database/dbmethods';
+import { update_movie_review } from '../database/dbmethods';
 import ReactStarRatings from 'react-star-ratings';
 import CommentComponent from '../components/CommentComponent';
+import { NewRating, SaveComment, WL_Modification, fetchWatchList } from './RDdependencies';
 
 const RateMovie: React.FC<any> = ( UserID ) => {
   const [MovieDetails, setMovieDetails] = useState<any>('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [MovieRating, setRating] = useState<number>(0);
+  const [WatchListMovieIds, setWatchListMovieIds] = useState<number[]>([]);
+  const [UserWatchList, setUserWatchList] = useState<any>('');
   const [userHasRated, setUserHasRated] = useState<boolean>(false);
-  const [OriginalComments, setOriginalComments] = useState<[]>([]);
+  const [OriginalComments, setOriginalComments] = useState<any[]>([]);
   const [MovieComment, setComment] = useState<string>('');
 
   // Function to fetch movie details and update review
@@ -58,10 +61,24 @@ const RateMovie: React.FC<any> = ( UserID ) => {
         body: JSON.stringify(updateMovieReview),
       });
 
-      setIsLoading(false);
     } catch (error) {
       console.error('Error occurred while fetching details about the movie:', error);
+    } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Function to fetch user watch list based on userID
+  const fetchUserWatchList = async (userId: number) => {
+    const result: string | any[] = await fetchWatchList(userId)
+
+    // Check if the result is a string or an array.
+    if (typeof result === "string") {
+      alert(result); 
+    } else {
+      // If result is an array, update user watch list and watch list movie IDs.
+      setUserWatchList(result[0]); 
+      setWatchListMovieIds(result[1]); 
     }
   };
 
@@ -69,48 +86,38 @@ const RateMovie: React.FC<any> = ( UserID ) => {
     const urlParams = new URLSearchParams(window.location.search);
     const title = urlParams.get('title');
 
-    // Fetch movie details when component mounts
+    // Fetch movie details and user watch list when component mounts
     if (title) {
       fetchAndUpdateMovieDetails(title);
-    } else {
-      setIsLoading(false);
+      fetchUserWatchList(UserID.UserID);
     }
   }, []);
 
-  // Function to handle new rating submission
+  // Handler for Watch List modification
+  const handle_WL_Modification = async (add: boolean) => {
+    const result: string | any[] = await WL_Modification(add, MovieDetails, UserWatchList, UserID.UserID);
+    
+    // Check if the result is a string or an array.
+    if (typeof result === "string") {
+        alert(result); 
+    } else {
+        // If result is an array, update user watch list and watch list movie IDs.
+        setUserWatchList(result[0]); 
+        setWatchListMovieIds(result[1]); 
+    }
+  }
+
+  // Handler for new rating submission
   const handleNewRating = async (newRating: number) => {
     setUserHasRated(true);
-    const timestamp = Math.floor(Date.now() / 1000);
+    const result: string | number = await NewRating(newRating, UserID.UserID, MovieDetails)
 
-    // Parse rated user IDs from movie details or initialize as an empty array
-    const rated_user_ids = JSON.parse(MovieDetails?.rated_user_ids || '[]');
-    // Add current user's ID to rated user IDs
-    rated_user_ids.push(UserID.UserID);
-
-    const NrOfRatings = rated_user_ids.length;
-    const movie_rating = ((MovieDetails.rating || 0) * (NrOfRatings - 1) + newRating) / (NrOfRatings);
-    
-    // Prepare data for updating movie rating
-    const update_rating: new_movie_rating = {
-      id: MovieDetails.id as number,
-      movie_rating: movie_rating,
-      rated_user_ids: JSON.stringify(rated_user_ids),
-      rate_dates: JSON.stringify([...(JSON.parse(MovieDetails?.rate_dates || '[]')), timestamp]),
-    };
-
-    // Send update request to backend
-    const response = await fetch('/api/updateMovieRating', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(update_rating),
-    });
-
-    // Handle response from backend
-    if (response.ok) {
-      setRating(movie_rating);
-    } else {
+    // Check if the result is a string or number.
+    if (typeof result === "string") {
       setUserHasRated(false);
-      alert('Server error! Error occurred while updating the movie rating!');
+      alert(result);
+    } else {
+      setRating(result);
     }
   };
 
@@ -118,44 +125,15 @@ const RateMovie: React.FC<any> = ( UserID ) => {
     // Update the comment state with the value from the input field
     setComment(e.target.value);
   };
-  
+
   const handleCommentSave = async () => {
-    // Check if the movie comment is empty or contains only whitespace
-    if (MovieComment === '' || /^\s*$/.test(MovieComment)) {
-      // Alert the user if the comment is empty
-      alert("Comment can't be empty!");
-      return; // Exit the function if the comment is empty
-    }
-  
-    // Create a new comment array containing the UserID and the movie comment
-    const new_comment = [UserID, MovieComment];
-  
-    // Parse the existing comments from the MovieDetails object or initialize an empty array
-    const comments = JSON.parse(MovieDetails?.comments || '[]');
-  
-    // Push the new comment into the existing comments array
-    comments.push(new_comment);
-  
-    // Prepare the payload with updated comments
-    const movie_comments: new_movie_comments = {
-      id: MovieDetails.id as number,
-      comments: JSON.stringify(comments), // Convert comments array back to JSON string
-    };
-  
-    // Send a POST request to the backend API to update movie comments
-    const response = await fetch('/api/updateMovieComments', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(movie_comments), // Send the updated movie comments data
-    });
-  
-    // Check if the request was successful
-    if (response.ok) {
-      setOriginalComments(comments)
+    const result: string | any[] = await SaveComment(MovieComment, UserID.UserID, MovieDetails)
+
+    // Check if the result is a string or array.
+    if (typeof result === "string") {
+      alert(result);
     } else {
-      alert('Error occurred while updating the movie comments!'); // Alert the user if an error occurs
+      setOriginalComments(result)
     }
   }
 
@@ -203,8 +181,15 @@ const RateMovie: React.FC<any> = ( UserID ) => {
           </div>
         </div>
       </div>
-      {/* Display release date */}
-      <p className="text-gray-700 mt-4 mb-4">Release date: {formattedDate}</p>
+      {/* Display release date and book mark*/}
+      <div className="flex items-center">
+        <p className="text-gray-700 mt-4 mb-4">Release date: {formattedDate}</p>
+        {WatchListMovieIds.includes(MovieDetails.id)? (
+          <img src="/bookmark_checkmark.png" alt="Watch list ✓" className="w-10 h-auto ml-auto" onClick={() => handle_WL_Modification(false)}/>
+        ):(
+          <img src="/bookmark_add.png" alt="Watch list +" className="w-10 h-auto ml-auto" onClick={() => handle_WL_Modification(true)}/>
+        )}
+      </div>
       {/* Render star ratings */}
       {userHasRated ? (
         <div className="flex items-center">

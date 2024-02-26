@@ -12,7 +12,7 @@ const Home: React.FC = () => {
   // Movie categories
   const categories = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-fi'];
   
-  // // useEffect hook to fetch trending movie data during component mount
+  // useEffect hook to fetch trending movie data during component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -95,7 +95,7 @@ const Home: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(category), // Send the updated movie comments data
+        body: JSON.stringify(category),
       });
     
       // Check if the request was successful

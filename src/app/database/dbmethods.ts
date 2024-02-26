@@ -44,6 +44,10 @@ export type update_user_type = {
   email: string,
   newType: string
 }
+export type update_user_WL = {
+  id: number,
+  WL: string
+}
 
 // Configuration for the PostgreSQL database
 const pool = new Pool({
@@ -61,6 +65,22 @@ export async function updateUserTypeByEmail(user: update_user_type): Promise<str
   try {
     // Update the user type
     await client.query('UPDATE users SET type = $1 WHERE email = $2', [user.newType, user.email]);
+    return 'Update successful';
+  } catch (error) {
+    console.error('Error during update:', error);
+    // Return a text in case of server error
+    return 'Server error';
+  } finally {
+    client.release();
+  }
+}
+
+// Update the user watch list in the "users" table based on ID
+export async function updateUserWatchL(user: update_user_WL) {
+  const client = await pool.connect();
+  try {
+    // Update the user type
+    await client.query('UPDATE users SET watchlist = $1 WHERE id = $2', [user.WL, user.id]);
     return 'Update successful';
   } catch (error) {
     console.error('Error during update:', error);
@@ -217,6 +237,22 @@ export async function getUserDetailsByEmail(email: string) {
   }
 }
 
+// Retrieve user watch list by id
+export async function getUserWL(id: number) {
+  const client = await pool.connect();
+  try {
+    // Retrieve the user watch list
+    const { rows } = await client.query('SELECT watchlist FROM users WHERE id = $1', [id]);
+    return rows[0].watchlist;
+  } catch (error) {
+    console.error('Error during query:', error);
+    // Return a text in case of server error
+    return 'Server error';
+  } finally {
+    client.release();
+  }
+}
+
 // Retrieve all users
 export async function getAllUsers() {
   const client = await pool.connect();
@@ -358,7 +394,8 @@ export async function createUsersTable() {
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        type VARCHAR(255) NOT NULL
+        type VARCHAR(255) NOT NULL,
+        watchlist TEXT
       )
     `);
     return 'success';
