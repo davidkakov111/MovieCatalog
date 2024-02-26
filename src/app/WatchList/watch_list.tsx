@@ -20,12 +20,12 @@ const Watchlist = (UserID: any) => {
         // If result is an array, then save the watch list.
         setWatchList(result[0]); 
         }
+        setbool(true);
     };
   
     // useEffect hook running on component mount
     useEffect(() => {
         fetchUserWatchList(UserID.UserID)
-        setbool(true)
     }, []); 
 
     if (!bool) {
