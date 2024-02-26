@@ -58,6 +58,14 @@ export default async function RootLayout({
                 ) : (
                   <div></div>
                 )}
+                {/* Watch list page */}
+                {user?.image === "Viewer" ? (
+                  <li>
+                    <Link href="/WatchList">Watch List</Link>
+                  </li>
+                ) : (
+                  <div></div>
+                )}
                 {session ? (
                   <li>
                     <SignOut />
