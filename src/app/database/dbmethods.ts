@@ -200,7 +200,7 @@ export async function getTrendingMovieDetails(until: number) {
 
 // Retrieve movies by category from the "movies" table
 export async function getMovieDetailsByCategory(category: string, wantPage: number, until: number) {
-  const before = (wantPage-1) * 2
+  const before = (wantPage-1) * until
   const client = await pool.connect();
   try {
     // Retrieve the movies by category
