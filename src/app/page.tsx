@@ -3,46 +3,38 @@
 import React, { useEffect, useState } from 'react';
 import Search from './components/search';
 import MovieComponent from './components/MovieComponent';
-import { fetchMoviesByCategory } from './components/CategoryComponent';
+import { fetchMoviesByCategory, fetchHotMovies } from './components/CategoryComponent';
 
 const Home: React.FC = () => {
-  // Initializing state to store movie data
-  const [HotTopicMovieData, setHotTopicMovieData] = useState<any[] | null>(null);  
+  const NrOfMoviesPerCategory = 10
+  // Initializing state to store movie data 
   const [moviesByCategory, setMoviesByCategory] = useState<{[key: string]: any[]}>({});
+  const [currentPage, setCurrentPage] = useState<{ [key: string]: number }>({
+    "Action": 1,
+    "Comedy": 1,
+    "Drama": 1,
+    "Horror": 1,
+    "Sci-fi": 1,
+  });
 
   // Movie categories
   const categories = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-fi'];
   
   // useEffect hook to fetch trending movie data during component mount
-  useEffect(() => {
+  useEffect( () => {
     const fetchData = async () => {
-      try {
-        // Sending a fetch request to the API
-        const response = await fetch('/api/TrendingMovieDetails', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        // Checking if the request was successful
-        if (response.ok) {
-          // Parsing the JSON response
-          const jsres = await response.json();
-          const extracted = jsres.result as any[];
-          setHotTopicMovieData(extracted);
-        } else {
-          const jsres = await response.json();
-          const extracted = jsres.result;
-          // Logging an error to the console in case of an error
-          console.error('Error fetching movies:', extracted);
-        }
-      } catch (error) {
-        // Logging an error to the console in case of an error
-        console.error('An error occurred:', error);
+      const result = await fetchHotMovies(NrOfMoviesPerCategory)
+      if (result === "Movie details are not available") {
+        alert("We don't have any more movies.")
+      } else if (typeof result === 'string') {
+        console.error(result)
+      } else {
+        setMoviesByCategory(prevState => ({
+          ...prevState,
+          ["Trending"]: result,
+        }));
       }
-    };
-
-    // Calling the fetchData function during component mount
+    }
     fetchData();
   }, []);
 
@@ -82,39 +74,46 @@ const Home: React.FC = () => {
         // If movies for this category haven't been fetched yet
         if (!moviesByCategory[category]) {
           // Fetch movies for this category
-          fetchMovies(category);
+          fetchMovies(category, 1);
         }
       }
     });
   };
 
   // Function to fetch movies by category
-  const fetchMovies = async (category: string) => {
-    const result = await fetchMoviesByCategory(category)
-    if (typeof result === 'string') {
+  const fetchMovies = async (category: string, wantPage: number) => {
+    const result = await fetchMoviesByCategory(category, wantPage, NrOfMoviesPerCategory)
+    if (result === "Movie details are not available") {
+      alert(`We don't have any more ${category} movies.`)
+    } else if (typeof result === 'string') {
       console.error(result)
     } else {
       setMoviesByCategory(prevState => ({
         ...prevState,
         [category]: result,
       }));
+      setCurrentPage((prevCurrentPage) => ({
+        ...prevCurrentPage,
+        [category]: wantPage,
+      }));
     }
   };
 
   // If the trending movies have not yet been loaded, display a loading message
-  if (!HotTopicMovieData) {
+  if (!moviesByCategory["Trending"]) {
     return (
-    <div className="flex items-center justify-center h-screen">
-      <h1 className="text-center">Loading...</h1>
-    </div>
+      <div className="flex items-center justify-center h-screen">
+        <h1 className="text-center">Loading...</h1>
+      </div>
     )
-  }
+  };
 
   // Display the search bar and movie components
   return (
     <div>
       <div className="mt-4 flex items-center justify-center gap-2 md:mt-8 flex-col">
-        <Search/>
+        {/* Search component */}
+        <Search />
       </div>
       <br />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -122,70 +121,32 @@ const Home: React.FC = () => {
           {/* Adding a title */}
           <h2 className="text-2xl font-semibold mb-4 text-center text-yellow-500">Recently Trending</h2>
           {/* Displaying movies using the MovieComponent */}
-          {HotTopicMovieData.map((movie, index) => (
+          {moviesByCategory["Trending"]?.map((movie: any, index: number) => (
             <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating}/>
           ))}
         </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center min-h-[500px]">
-          {/* Adding a title */}
-          <h2 className="text-2xl font-semibold mb-4 text-center">Action</h2>
-          {/* Displaying movies using the MovieComponent */}
-          <div key={"Action"} id={"Action"}>
-            <div className="movie-grid">
-              {moviesByCategory["Action"]?.map((movie: any, index) => (
-                <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating} />
-              ))}
+        {/* Render each category */}
+        {categories.map((category) => (
+          <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center min-h-[500px]" key={category}>
+            <h2 className="text-2xl font-semibold mb-4 text-center">{category}</h2>
+            <div key={category} id={category}>
+              <div className="movie-grid">
+                {moviesByCategory[category]?.map((movie: any, index: number) => (
+                  <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating} />
+                ))}
+              </div>
+            </div>
+            <div>
+              <button onClick={() => fetchMovies(category, (currentPage[category]-1))} disabled={currentPage[category] === 1} className="text-gray-600 hover:text-gray-800 focus:outline-none text-3xl mr-4 px-3 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors duration-300">
+                ←
+              </button>
+              {currentPage[category]}
+              <button onClick={() => fetchMovies(category, (currentPage[category]+1))} className="text-gray-600 hover:text-gray-800 focus:outline-none text-3xl ml-4 px-3 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors duration-300">
+                →
+              </button>
             </div>
           </div>
-        </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center min-h-[500px]">
-          {/* Adding a title */}
-          <h2 className="text-2xl font-semibold mb-4 text-center">Comedy</h2>
-          {/* Displaying movies using the MovieComponent */}
-          <div key={"Comedy"} id={"Comedy"}>
-            <div className="movie-grid">
-              {moviesByCategory["Comedy"]?.map((movie: any, index) => (
-                <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating} />
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center min-h-[500px]">
-          {/* Adding a title */}
-          <h2 className="text-2xl font-semibold mb-4 text-center">Drama</h2>
-          {/* Displaying movies using the MovieComponent */}
-          <div key={"Drama"} id={"Drama"}>
-            <div className="movie-grid">
-              {moviesByCategory["Drama"]?.map((movie: any, index) => (
-                <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating} />
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center min-h-[500px]">
-          {/* Adding a title */}
-          <h2 className="text-2xl font-semibold mb-4 text-center">Horror</h2>
-          {/* Displaying movies using the MovieComponent */}
-          <div key={"Horror"} id={"Horror"}>
-            <div className="movie-grid">
-              {moviesByCategory["Horror"]?.map((movie: any, index) => (
-                <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating} />
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="bg-black bg-opacity-15 rounded-lg p-4 flex flex-col items-center min-h-[500px]">
-          {/* Adding a title */}
-          <h2 className="text-2xl font-semibold mb-4 text-center">Sci-fi</h2>
-          {/* Displaying movies using the MovieComponent */}
-          <div key={"Sci-fi"} id={"Sci-fi"}>
-            <div className="movie-grid">
-              {moviesByCategory["Sci-fi"]?.map((movie: any, index) => (
-                <MovieComponent key={index} title={movie.title} imageUrl={movie.poster_url} rating={movie.rating} />
-              ))}
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

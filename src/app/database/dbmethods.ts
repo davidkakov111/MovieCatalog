@@ -179,11 +179,11 @@ export async function getMovieDetailsByTitle(title: string) {
 }
 
 // Retrieve the recently trending movies from the "movies" table
-export async function getTrendingMovieDetails() {
+export async function getTrendingMovieDetails(until: number) {
   const client = await pool.connect();
   try {
     // Retrieve the recently trending movie details 
-    const rows = await client.query('SELECT title, poster_url, rating, (reviews + 5 * COUNT(rate_dates_element)) AS popularity_index FROM movies LEFT JOIN LATERAL json_array_elements_text(rate_dates::json) AS rate_dates_element ON true GROUP BY title, poster_url, rating, reviews ORDER BY popularity_index DESC LIMIT 5;');
+    const rows = await client.query('SELECT title, poster_url, rating, (reviews + 5 * COUNT(rate_dates_element)) AS popularity_index FROM movies LEFT JOIN LATERAL json_array_elements_text(rate_dates::json) AS rate_dates_element ON true GROUP BY title, poster_url, rating, reviews ORDER BY popularity_index DESC LIMIT $1;', [until]);
     const result = rows.rows
     if (result.length === 0) {
       return "Movie details are not available";
@@ -199,11 +199,12 @@ export async function getTrendingMovieDetails() {
 }
 
 // Retrieve movies by category from the "movies" table
-export async function getMovieDetailsByCategory(category: string) {
+export async function getMovieDetailsByCategory(category: string, wantPage: number, until: number) {
+  const before = (wantPage-1) * 2
   const client = await pool.connect();
   try {
     // Retrieve the movies by category
-    const rows = await client.query('SELECT title, poster_url, rating FROM movies WHERE category = $1', [category]);
+    const rows = await client.query('SELECT title, poster_url, rating FROM movies WHERE category = $1 OFFSET $2 ROWS FETCH NEXT $3 ROWS ONLY;', [category, before, until]);
     const result = rows.rows
     if (result.length === 0) {
       return "Movie details are not available";
